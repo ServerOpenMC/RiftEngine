@@ -1,0 +1,15 @@
+name: RiftEngine
+version: ${version}
+main: fr.openmc.riftengine.core.RiftPlugin
+description: Plugin convert Java pack to Bedrock pack
+api-version: ${minecraftVersion}
+# bootstrapper: fr.openmc.riftengine.core.RiftBootstrap
+
+dependencies:
+  server:
+    OpenMC:
+      load: AFTER
+      required: true
+    ItemsAdder:
+      load: AFTER
+      required: true

@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+    id "io.papermc.paperweight.userdev" version "${paperWeightUserDevVersion}"
+}
+
+group = 'fr.openmc.riftengine'
+version = '0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    paperweight.paperDevBundle "${minecraftVersion}.build.${paperVersion}"
+
+    compileOnly files("libs/OpenMC.jar")
+    implementation "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+}
