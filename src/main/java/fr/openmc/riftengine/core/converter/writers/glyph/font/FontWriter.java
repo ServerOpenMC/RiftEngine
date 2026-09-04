@@ -50,9 +50,16 @@ public class FontWriter implements PackWriter {
                         String file = IdentifierUtils.normalizeId(provider.get("file").getAsString());
 
                         fontNamespace = file.split(":")[0];
-                        fontId = file.split(":")[1]
-                                .replace("font/", "")
-                                .replace(".png", "");
+
+                        if (file.split(":").length == 2) {
+                            fontId = file.split(":")[1]
+                                    .replace("font/", "")
+                                    .replace(".png", "");
+                        } else {
+                            fontId = file
+                                    .replace("font/", "")
+                                    .replace(".png", "");
+                        }
                         fontPng = IdentifierUtils.resolveTextureId(javaRootPath, file).toFile();
                         fontsChar = provider.getAsJsonArray("chars");
                     }

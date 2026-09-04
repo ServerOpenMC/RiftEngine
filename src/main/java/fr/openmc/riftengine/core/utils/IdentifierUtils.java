@@ -21,7 +21,7 @@ public class IdentifierUtils {
     public static String normalizeId(String id, String defaultNamespace) {
         if (id.split(":").length == 2) return id;
 
-        return defaultNamespace + id;
+        return defaultNamespace + ":" + id;
     }
 
     /**
@@ -30,10 +30,17 @@ public class IdentifierUtils {
     public static Path resolveTextureId(Path rootPath, String id) {
         String normalizedId = normalizeId(id);
 
-        return rootPath
+        String[] split = normalizedId.split(":");
+        if (split.length == 2)
+           return rootPath
                 .resolve("assets")
                 .resolve(normalizedId.split(":")[0])
                 .resolve("textures")
                 .resolve(normalizedId.split(":")[1]);
+        else return rootPath
+                .resolve("assets")
+                .resolve("minecraft")
+                .resolve("textures")
+                .resolve(normalizedId.split(":")[0]);
     }
 }
