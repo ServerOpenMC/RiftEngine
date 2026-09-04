@@ -8,8 +8,11 @@ import java.util.List;
 
 public class GlyphsRegistry extends Registry<String, Glyph>
     implements KeyedRegistry<String, Glyph> {
+    public static final int GRID_SIZE = 16;
+    public static final int MAX_PER_PAGE = GRID_SIZE * GRID_SIZE;
 
-    private final List<String> SLOT_GLYPH = new ArrayList<>(List.of("E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "EA", "EB", "EC", "ED", "EE", "EF",
+    private final List<String> SLOT_GLYPH = new ArrayList<>(List.of(
+            "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "EA", "EB", "EC", "ED", "EE", "EF",
             "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"));
     private int nextPageIndex = 0;
 

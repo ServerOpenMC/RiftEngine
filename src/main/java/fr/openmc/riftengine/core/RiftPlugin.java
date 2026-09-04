@@ -54,7 +54,7 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
 
         GlyphsRegistry glyphsRegistry = RiftRegistry.GLYPHS;
         OMCLogger.info("RiftEngine activé!");
-        OMCLogger.infoFormatted(glyphsRegistry.size() + "/" + glyphsRegistry.maxSize() + "glyphs enregistré");
+        OMCLogger.infoFormatted(glyphsRegistry.size() + "/" + glyphsRegistry.maxSize() + " glyphs enregistré");
         OMCLogger.infoFormatted("Glyphs : " + glyphsRegistry.values());
     }
 

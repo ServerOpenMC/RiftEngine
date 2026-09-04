@@ -1,4 +1,4 @@
-package fr.openmc.riftengine.core.converter.writers.font;
+package fr.openmc.riftengine.core.converter.writers.glyph.font;
 
 import com.google.gson.JsonArray;
 

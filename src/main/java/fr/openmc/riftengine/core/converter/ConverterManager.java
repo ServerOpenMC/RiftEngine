@@ -4,7 +4,8 @@ import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.riftengine.core.RiftConfig;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
-import fr.openmc.riftengine.core.converter.writers.font.FontWriter;
+import fr.openmc.riftengine.core.converter.writers.glyph.font.FontWriter;
+import fr.openmc.riftengine.core.converter.writers.glyph.icons.IconsWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.IconWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
@@ -30,6 +31,7 @@ public class ConverterManager {
     public ConverterManager(RiftPlugin plugin) {
         this.plugin = plugin;
         RiftConfig config = plugin.getRiftConfig();
+        Path itemsAdderContents = getItemsAdderContents(plugin);
 
         try {
             identity = PackIdentity.loadOrCreate(plugin);
@@ -38,7 +40,8 @@ public class ConverterManager {
                     new ManifestWriter(identity),
                     new TranslationInjector(),
                     new FontWriter(),
-                    new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock())
+                    new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock()),
+                    new IconsWriter(itemsAdderContents)
             ));
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors d'initialisation du ConverterManager", e);
@@ -80,5 +83,13 @@ public class ConverterManager {
         File generatedDir = new File(outputDir, "generated.zip"); // * root/plugins/ItemsAdder/output/generated.zip
 
         return generatedDir.toPath();
+    }
+
+    public static Path getItemsAdderContents(JavaPlugin plugin) {
+        File pluginsDir = plugin.getDataFolder().getParentFile(); // * root/plugins/
+        File itemsAdderDir = new File(pluginsDir, "ItemsAdder"); // * root/plugins/ItemsAdder
+        File contentDir = new File(itemsAdderDir, "contents"); // * root/plugins/ItemsAdder/output
+
+        return contentDir.toPath();
     }
 }
