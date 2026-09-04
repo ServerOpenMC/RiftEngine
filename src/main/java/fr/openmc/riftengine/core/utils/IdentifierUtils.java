@@ -29,18 +29,27 @@ public class IdentifierUtils {
      */
     public static Path resolveTextureId(Path rootPath, String id) {
         String normalizedId = normalizeId(id);
+        String[] split = normalizedId.split(":", 2);
 
-        String[] split = normalizedId.split(":");
-        if (split.length == 2)
-           return rootPath
+        String namespace;
+        String texturePath;
+
+        if (split.length == 2) {
+            namespace = split[0];
+            texturePath = split[1];
+        } else {
+            namespace = "minecraft";
+            texturePath = split[0];
+        }
+
+        if (!texturePath.endsWith(".png")) {
+            texturePath += ".png";
+        }
+
+        return rootPath
                 .resolve("assets")
-                .resolve(normalizedId.split(":")[0])
+                .resolve(namespace)
                 .resolve("textures")
-                .resolve(normalizedId.split(":")[1]);
-        else return rootPath
-                .resolve("assets")
-                .resolve("minecraft")
-                .resolve("textures")
-                .resolve(normalizedId.split(":")[0]);
+                .resolve(texturePath);
     }
 }

@@ -11,19 +11,29 @@ public record IconEntry(
         String namespace,
         String key,
         Function<Path, Path> path,
-        int permission,
+        String permission,
         boolean showInGui,
         double scaleRatio,
         int yPosition,
         Path sourceYml
 ) {
     public static IconEntry from(Path sourceYml, String namespace, String key, Map<?, ?> data) {
+        String permission;
+
+        if (data.get("permission") instanceof String perm) {
+            permission = perm;
+        } else if (data.get("permission") instanceof Number num) {
+            permission = "ia.user.image.use." + num.intValue();
+        } else {
+            permission = null;
+        }
+
         return new IconEntry(
                 namespace,
                 key,
                 javaRoot -> IdentifierUtils.resolveTextureId(javaRoot,
                         IdentifierUtils.normalizeId(String.valueOf(data.get("path")), namespace)),
-                YmlUtils.getInt(data.get("permission"), 0),
+                permission,
                 YmlUtils.getBool(data.get("show_in_gui"), true),
                 YmlUtils.getDouble(data.get("scale_ratio"), 9),
                 YmlUtils.getInt(data.get("y_position"), 8),
