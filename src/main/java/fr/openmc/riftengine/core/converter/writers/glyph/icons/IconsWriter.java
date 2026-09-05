@@ -127,7 +127,8 @@ public class IconsWriter implements PackWriter {
                         resolvedEmoji.entry.namespacedId(),
                         page,
                         row,
-                        col
+                        col,
+                        resolvedEmoji.entry
                 ));
             }
         } finally {

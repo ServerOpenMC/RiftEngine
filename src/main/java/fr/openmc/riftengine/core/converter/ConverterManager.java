@@ -7,6 +7,7 @@ import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.font.FontWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.icons.IconsWriter;
+import fr.openmc.riftengine.core.converter.writers.glyph.icons.SymbolWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.IconWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
@@ -42,7 +43,8 @@ public class ConverterManager {
                     new TranslationInjector(),
                     new FontWriter(),
                     new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock()),
-                    new IconsWriter(itemsAdderContents)
+                    new IconsWriter(itemsAdderContents),
+                    new SymbolWriter()
             ));
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors d'initialisation du ConverterManager", e);

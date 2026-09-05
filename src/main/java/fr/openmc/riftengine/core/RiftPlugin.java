@@ -4,9 +4,11 @@ import fr.openmc.core.CommandsManager;
 import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.riftengine.core.commands.GlyphCommand;
 import fr.openmc.riftengine.core.converter.ConverterManager;
+import fr.openmc.riftengine.core.listeners.LoadAfterItemsAdderListener;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.geysermc.event.Event;
 import org.geysermc.geyser.api.GeyserApi;
@@ -58,6 +60,9 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
 
         // * Listeners
         registerEvent(SessionLoadResourcePacksEvent.class, this::onLoadResourcePacks);
+        registerListener(
+                new LoadAfterItemsAdderListener()
+        );
 
         // * Commands
         for (Object command : commands) {
@@ -96,6 +101,11 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
         event.register(pack, PriorityOption.HIGHEST);
 
         OMCLogger.successFormatted("RiftEngine: pack registered !");
+    }
+
+    public void registerListener(Listener... listeners) {
+        for (Listener listener : listeners)
+            this.getServer().getPluginManager().registerEvents(listener, this);
     }
 
     public <T extends Event> void registerEvent(Class<T> listenerClass, Consumer<T> handler) {

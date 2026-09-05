@@ -24,6 +24,11 @@ public class GlyphsRegistry extends Registry<String, Glyph>
     }
 
     @Override
+    public void init() {
+
+    }
+
+    @Override
     public String key(Glyph glyph) {
         return glyph.getNamespacedId();
     }
