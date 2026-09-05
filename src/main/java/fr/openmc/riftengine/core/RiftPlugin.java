@@ -1,6 +1,8 @@
 package fr.openmc.riftengine.core;
 
+import fr.openmc.core.CommandsManager;
 import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.riftengine.core.commands.GlyphCommand;
 import fr.openmc.riftengine.core.converter.ConverterManager;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
 import lombok.Getter;
@@ -16,6 +18,8 @@ import org.geysermc.geyser.api.pack.option.PriorityOption;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class RiftPlugin extends JavaPlugin implements EventRegistrar {
@@ -29,8 +33,11 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
     @Getter
     private RiftConfig riftConfig;
 
-    private ConverterManager converterManager;
+    private List<Object> commands = new ArrayList<>(List.of(
+            new GlyphCommand()
+    ));
 
+    private ConverterManager converterManager;
     public static final int[] RP_VERSION = new int[] {1,0};
 
     @Override
@@ -51,6 +58,11 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
 
         // * Listeners
         registerEvent(SessionLoadResourcePacksEvent.class, this::onLoadResourcePacks);
+
+        // * Commands
+        for (Object command : commands) {
+            CommandsManager.getHandler().register(command);
+        }
 
         GlyphsRegistry glyphsRegistry = RiftRegistry.GLYPHS;
         OMCLogger.info("RiftEngine activé!");
