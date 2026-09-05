@@ -100,9 +100,13 @@ public class IconsWriter implements PackWriter {
         BufferedImage pageImage = new BufferedImage(
                 cellWidth * GlyphsRegistry.GRID_SIZE,
                 cellHeight * GlyphsRegistry.GRID_SIZE,
-                BufferedImage.TYPE_INT_RGB
+                BufferedImage.TYPE_INT_ARGB
         );
+
         Graphics2D imageEditable = pageImage.createGraphics();
+        // * Options pour permettre une texture plus propre lors du resize
+        imageEditable.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        imageEditable.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         try {
             for (int i = 0; i < icons.size(); i++) {
