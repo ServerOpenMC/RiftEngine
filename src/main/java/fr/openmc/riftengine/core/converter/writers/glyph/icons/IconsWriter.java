@@ -14,8 +14,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class IconsWriter implements PackWriter {
 
@@ -70,17 +72,15 @@ public class IconsWriter implements PackWriter {
 
         if (resolved.isEmpty()) return;
 
-        Map<Dimension, List<ResolvedIcon>> groupedBySize = new LinkedHashMap<>();
-        resolved.stream()
-                .sorted(Comparator.comparingInt((ResolvedIcon r) -> r.image.getWidth() * r.image.getHeight())
-                        .reversed())
-                .forEach(r -> groupedBySize
-                        .computeIfAbsent(new Dimension(r.image.getWidth(), r.image.getHeight()),
-                                _ -> new ArrayList<>())
-                        .add(r));
+        Map<Integer, List<ResolvedIcon>> groupedByGroupSize = new TreeMap<>();
+        for (ResolvedIcon r : resolved) {
+            int maxDim = Math.max(r.image.getWidth(), r.image.getHeight());
+            int bucket = IconsRegrouperUtils.pickBestGroup(maxDim);
+            groupedByGroupSize.computeIfAbsent(bucket, b -> new ArrayList<>()).add(r);
+        }
 
-        for (Map.Entry<Dimension, List<ResolvedIcon>> group : groupedBySize.entrySet()) {
-            Dimension size = group.getKey();
+        for (Map.Entry<Integer, List<ResolvedIcon>> group : groupedByGroupSize.entrySet()) {
+            Dimension size = new Dimension(group.getKey(), group.getKey());
             List<ResolvedIcon> icons = group.getValue();
 
             for (int slotPage = 0; slotPage < icons.size(); slotPage += GlyphsRegistry.MAX_PER_PAGE) {
