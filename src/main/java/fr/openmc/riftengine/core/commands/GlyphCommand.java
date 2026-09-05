@@ -19,6 +19,6 @@ public class GlyphCommand {
     ) {
         if (RiftRegistry.GLYPHS.get(namespacedId).isEmpty()) return;
 
-        player.sendMessage(RiftRegistry.GLYPHS.get(namespacedId).get().getBedrockChar() + "");
+        player.sendMessage("caractere mis : " + RiftRegistry.GLYPHS.get(namespacedId).get().getBedrockChar());
     }
 }

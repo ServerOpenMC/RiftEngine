@@ -74,9 +74,8 @@ public class IconsWriter implements PackWriter {
 
         Map<Integer, List<ResolvedIcon>> groupedByGroupSize = new TreeMap<>();
         for (ResolvedIcon r : resolved) {
-            int maxDim = Math.max(r.image.getWidth(), r.image.getHeight());
-            int bucket = IconsRegrouperUtils.pickBestGroup(maxDim);
-            groupedByGroupSize.computeIfAbsent(bucket, b -> new ArrayList<>()).add(r);
+            Integer group = IconsRegrouperUtils.pickBestGroup(r.image.getWidth(), r.image.getHeight());
+            groupedByGroupSize.computeIfAbsent(group, b -> new ArrayList<>()).add(r);
         }
 
         for (Map.Entry<Integer, List<ResolvedIcon>> group : groupedByGroupSize.entrySet()) {
@@ -105,8 +104,8 @@ public class IconsWriter implements PackWriter {
 
         Graphics2D imageEditable = pageImage.createGraphics();
         // * Options pour permettre une texture plus propre lors du resize
-        imageEditable.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        imageEditable.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        imageEditable.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        imageEditable.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
         try {
             for (int i = 0; i < icons.size(); i++) {
@@ -114,7 +113,7 @@ public class IconsWriter implements PackWriter {
                 int row = i / GlyphsRegistry.GRID_SIZE;
                 int col = i % GlyphsRegistry.GRID_SIZE;
 
-                Rectangle placement = centerImage(resolvedEmoji.image, cellWidth);
+                Rectangle placement = centerImage(resolvedEmoji.image, cellWidth, cellHeight);
                 imageEditable.drawImage(
                         resolvedEmoji.image,
                         col * cellWidth + placement.x,
@@ -141,16 +140,28 @@ public class IconsWriter implements PackWriter {
         ImageIO.write(pageImage, "png", glyphPath.toFile());
     }
 
-    private Rectangle centerImage(BufferedImage image, int cellSize) {
+    private Rectangle centerImage(BufferedImage image, int cellWidth, int cellHeight) {
         int w = image.getWidth();
         int h = image.getHeight();
 
-        double scale = Math.min((double) cellSize / w, (double) cellSize / h);
-        w = (int) Math.round(w * scale);
-        h = (int) Math.round(h * scale);
+        if (w <= cellWidth && h <= cellHeight) {
+            int x = (cellWidth - w) / 2;
+            int y = (cellHeight - h) / 2;
 
-        int x = (cellSize - w) / 2;
-        int y = (cellSize - h) / 2;
+            return new Rectangle(x, y, w, h);
+        }
+
+        double scale = Math.min(
+                (double) cellWidth / w,
+                (double) cellHeight / h
+        );
+
+        w = Math.max(1, (int) Math.round(w * scale));
+        h = Math.max(1, (int) Math.round(h * scale));
+
+        int x = (cellWidth - w) / 2;
+        int y = (cellHeight - h) / 2;
+
         return new Rectangle(x, y, w, h);
     }
 
