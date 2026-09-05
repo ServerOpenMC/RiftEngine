@@ -1,6 +1,7 @@
 package fr.openmc.riftengine.core.converter;
 
 import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.core.utils.FilesUtils;
 import fr.openmc.riftengine.core.RiftConfig;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
@@ -55,7 +56,7 @@ public class ConverterManager {
         Path javaPackPath = getJavaPackPath(RiftPlugin.getInstance());
 
         Path outputDir = plugin.getDataFolder().toPath().resolve("output");
-        Files.deleteIfExists(outputDir);
+        FilesUtils.deleteDirectory(outputDir.toFile());
         Files.createDirectories(outputDir);
 
         Path workDir = outputDir.resolve("internal");
