@@ -55,6 +55,8 @@ public class ConverterManager {
         Path javaPackPath = getJavaPackPath(RiftPlugin.getInstance());
 
         Path outputDir = plugin.getDataFolder().toPath().resolve("output");
+        if (outputDir.toFile().isDirectory())
+            outputDir.toFile().delete();
         Files.createDirectories(outputDir);
 
         Path workDir = outputDir.resolve("internal");
