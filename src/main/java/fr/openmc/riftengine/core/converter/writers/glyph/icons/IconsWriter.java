@@ -110,7 +110,15 @@ public class IconsWriter implements PackWriter {
                 int row = i / GlyphsRegistry.GRID_SIZE;
                 int col = i % GlyphsRegistry.GRID_SIZE;
 
-                imageEditable.drawImage(resolvedEmoji.image, col * cellWidth, row * cellHeight, null);
+                Rectangle placement = centerImage(resolvedEmoji.image, cellWidth);
+                imageEditable.drawImage(
+                        resolvedEmoji.image,
+                        col * cellWidth + placement.x,
+                        row * cellHeight + placement.y,
+                        placement.width,
+                        placement.height,
+                        null
+                );
 
                 RiftRegistry.GLYPHS.register(new IconGlyph(
                         resolvedEmoji.entry.namespacedId(),
@@ -127,6 +135,19 @@ public class IconsWriter implements PackWriter {
         Path glyphPath = bedrockRootPath.resolve("font").resolve(fileName);
         Files.createDirectories(glyphPath.getParent());
         ImageIO.write(pageImage, "png", glyphPath.toFile());
+    }
+
+    private Rectangle centerImage(BufferedImage image, int cellSize) {
+        int w = image.getWidth();
+        int h = image.getHeight();
+
+        double scale = Math.min((double) cellSize / w, (double) cellSize / h);
+        w = (int) Math.round(w * scale);
+        h = (int) Math.round(h * scale);
+
+        int x = (cellSize - w) / 2;
+        int y = (cellSize - h) / 2;
+        return new Rectangle(x, y, w, h);
     }
 
     private record ResolvedIcon(IconEntry entry, BufferedImage image) {}
