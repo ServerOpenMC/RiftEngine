@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+// todo: faire un converter manager clean, avec des systemes de step, (surtout du coté logger aussi)
 public class ConverterManager {
 
     private final RiftPlugin plugin;

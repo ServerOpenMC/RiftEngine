@@ -2,7 +2,7 @@ package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
 public class IconsRegrouperUtils {
 
-    private final static int[] GROUP_SIZE = {8, 16, 24, 32, 48, 64, 96, 128, 192, 256};
+    private final static int[] GROUP_SIZE = {8, 16, 20, 24, 32, 48, 64, 96, 128, 192, 256, 512};
 
     /**
      * Utilitaire pour choisir la meilleur dimension dans lequel mettre l'emoji/icons
@@ -21,18 +21,12 @@ public class IconsRegrouperUtils {
      * @return la dimension la plus proche de maxDim
      */
     public static int pickBestSize(int maxDim) {
-        int close = GROUP_SIZE[0];
-        int minDiff = Math.abs(maxDim - close);
-
         for (int size : GROUP_SIZE) {
-            int diff = Math.abs(maxDim - size);
-
-            if (diff < minDiff) {
-                minDiff = diff;
-                close = size;
+            if (maxDim <= size) {
+                return size;
             }
         }
 
-        return close;
+        throw new IllegalArgumentException("Image trop grande : " + maxDim + " max " + GROUP_SIZE[GROUP_SIZE.length - 1]);
     }
 }
