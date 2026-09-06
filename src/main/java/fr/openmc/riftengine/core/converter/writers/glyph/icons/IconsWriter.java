@@ -63,6 +63,7 @@ public class IconsWriter implements PackWriter {
                 continue;
             }
 
+            System.out.println(entry.key() + " : " + image.getWidth() + "x" + image.getHeight() + " (scale ratio: " + entry.scaleRatio() + ")");
             resolved.add(new ResolvedIcon(entry, image));
         }
 

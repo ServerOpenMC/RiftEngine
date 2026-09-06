@@ -27,6 +27,6 @@ public class IconsRegrouperUtils {
             }
         }
 
-        throw new IllegalArgumentException("Image trop grande : " + maxDim + " max " + GROUP_SIZE[GROUP_SIZE.length - 1]);
+        return GROUP_SIZE[GROUP_SIZE.length - 1];
     }
 }

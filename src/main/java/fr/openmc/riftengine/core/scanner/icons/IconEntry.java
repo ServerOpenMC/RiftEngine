@@ -13,8 +13,8 @@ public record IconEntry(
         Function<Path, Path> path,
         String permission,
         boolean showInGui,
-        double scaleRatio,
-        int yPosition,
+        Double scaleRatio,
+        Integer yPosition,
         Path sourceYml
 ) {
     public static IconEntry from(Path sourceYml, String namespace, String key, Map<?, ?> data) {
@@ -35,8 +35,8 @@ public record IconEntry(
                         IdentifierUtils.normalizeId(String.valueOf(data.get("path")), namespace)),
                 permission,
                 YmlUtils.getBool(data.get("show_in_gui"), true),
-                YmlUtils.getDouble(data.get("scale_ratio"), 9),
-                YmlUtils.getInt(data.get("y_position"), 8),
+                YmlUtils.getDouble(data.get("scale_ratio"), null),
+                YmlUtils.getInt(data.get("y_position"), null),
                 sourceYml
         );
     }

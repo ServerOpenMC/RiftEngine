@@ -17,19 +17,19 @@ public class YmlUtils {
         }
     }
 
-    public static int getInt(Object obj, int def) {
+    public static Integer getInt(Object obj, Integer def) {
         if (obj == null) return def;
         if (obj instanceof Number n) return n.intValue();
         return Integer.parseInt(obj.toString());
     }
 
-    public static boolean getBool(Object obj, boolean def) {
+    public static Boolean getBool(Object obj, Boolean def) {
         if (obj == null) return def;
         if (obj instanceof Boolean b) return b;
         return Boolean.parseBoolean(obj.toString());
     }
 
-    public static double getDouble(Object obj, double def) {
+    public static Double getDouble(Object obj, Double def) {
         if (obj == null) return def;
         if (obj instanceof Number n) return n.doubleValue();
         return Double.parseDouble(obj.toString());
