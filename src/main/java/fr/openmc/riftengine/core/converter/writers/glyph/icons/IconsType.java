@@ -31,7 +31,7 @@ public enum IconsType {
 
         @Override
         public Dimension finalSize(IconEntry entry, int width, int height) {
-            return new Dimension(width, height);
+            return new Dimension(0, 0);
         }
 
         @Override

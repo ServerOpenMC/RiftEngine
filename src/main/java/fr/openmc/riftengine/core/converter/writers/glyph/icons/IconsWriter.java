@@ -70,10 +70,14 @@ public class IconsWriter implements PackWriter {
                 continue;
             }
 
-            System.out.println(entry.key() + " : " + image.getWidth() + "x" + image.getHeight() + " (scale ratio: " + entry.scaleRatio() + ")");
             IconsType type = forcedType.get(entry.namespacedId());
             if (type == null) {
                 type = IconsType.detect(image.getWidth(), image.getHeight());
+            }
+
+            if (type.equals(IconsType.MENU_GUI)) {
+                OMCLogger.warnFormatted("Glyph " + entry.namespacedId() + " detécté comme MENU_GUI, il ne sera donc pas en glyph, vu que les menus sont géré autrement");
+                continue;
             }
 
             resolved.add(new ResolvedIcon(entry, image, type));
