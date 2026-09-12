@@ -20,6 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Writer qui prends en charge l'assignation des characteres des glyphs, et qui donne les mappings a items adder
+ */
 public class SymbolWriter implements PackWriter {
 
     @Override

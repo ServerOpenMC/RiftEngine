@@ -1,6 +1,7 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
 import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
@@ -19,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Writer qui gère la prise en charge des icons/emojis ("font_images" d'items adder)
+ */
 public class IconsWriter implements PackWriter {
 
     private final Path itemsAdderContentsPath;
@@ -29,6 +33,9 @@ public class IconsWriter implements PackWriter {
 
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws IOException {
+        IconsTypeConfig forcedType = IconsTypeConfig.load(RiftPlugin.getInstance().CONFIG_FOLDER
+                .resolve("icons_types.yml"));
+
         IconScanner scanner = RiftRegistry.SCANNERS.ICONS;
         List<IconEntry> entries;
         try {
@@ -64,7 +71,12 @@ public class IconsWriter implements PackWriter {
             }
 
             System.out.println(entry.key() + " : " + image.getWidth() + "x" + image.getHeight() + " (scale ratio: " + entry.scaleRatio() + ")");
-            resolved.add(new ResolvedIcon(entry, image));
+            IconsType type = forcedType.get(entry.namespacedId());
+            if (type == null) {
+                type = IconsType.detect(image.getWidth(), image.getHeight());
+            }
+
+            resolved.add(new ResolvedIcon(entry, image, type));
         }
 
         if (skipped > 0) {
@@ -75,8 +87,11 @@ public class IconsWriter implements PackWriter {
 
         Map<Integer, List<ResolvedIcon>> groupedByGroupSize = new TreeMap<>();
         for (ResolvedIcon r : resolved) {
-            Integer group = IconsRegrouperUtils.pickBestGroup(r.image.getWidth(), r.image.getHeight());
-            groupedByGroupSize.computeIfAbsent(group, b -> new ArrayList<>()).add(r);
+            Dimension finalSize = r.type().finalSize(r.entry(), r.image().getWidth(), r.image().getHeight());
+            int targetFinalSize = Math.max(finalSize.width, finalSize.height);
+
+            Integer group = IconsRegrouperUtils.pickBestSize(targetFinalSize);
+            groupedByGroupSize.computeIfAbsent(group, _ -> new ArrayList<>()).add(r);
         }
 
         for (Map.Entry<Integer, List<ResolvedIcon>> group : groupedByGroupSize.entrySet()) {
@@ -104,7 +119,6 @@ public class IconsWriter implements PackWriter {
         );
 
         Graphics2D imageEditable = pageImage.createGraphics();
-        // * Options pour permettre une texture plus propre lors du resize
         imageEditable.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         imageEditable.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
@@ -114,7 +128,12 @@ public class IconsWriter implements PackWriter {
                 int row = i / GlyphsRegistry.GRID_SIZE;
                 int col = i % GlyphsRegistry.GRID_SIZE;
 
-                Rectangle placement = centerImage(resolvedEmoji.image, cellWidth, cellHeight);
+                IconsType type = resolvedEmoji.type();
+                OMCLogger.infoFormatted(resolvedEmoji.entry().namespacedId() + " ("
+                        + resolvedEmoji.image().getWidth() + "x" + resolvedEmoji.image().getHeight()
+                        + ") détecté comme " + type);
+
+                Rectangle placement = centerImage(resolvedEmoji.image(), cellWidth, cellHeight, resolvedEmoji.entry(), type);
                 imageEditable.drawImage(
                         resolvedEmoji.image,
                         col * cellWidth + placement.x,
@@ -142,30 +161,22 @@ public class IconsWriter implements PackWriter {
         ImageIO.write(pageImage, "png", glyphPath.toFile());
     }
 
-    private Rectangle centerImage(BufferedImage image, int cellWidth, int cellHeight) {
-        int w = image.getWidth();
-        int h = image.getHeight();
-
-        if (w <= cellWidth && h <= cellHeight) {
-            int x = (cellWidth - w) / 2;
-            int y = (cellHeight - h) / 2;
-
-            return new Rectangle(x, y, w, h);
-        }
-
-        double scale = Math.min(
-                (double) cellWidth / w,
-                (double) cellHeight / h
-        );
-
-        w = Math.max(1, (int) Math.round(w * scale));
-        h = Math.max(1, (int) Math.round(h * scale));
+    private Rectangle centerImage(BufferedImage image, int cellWidth, int cellHeight, IconEntry entry, IconsType type) {
+        Dimension finalSize = type.finalSize(entry, image.getWidth(), image.getHeight());
+        int w = Math.min(cellWidth, finalSize.width);
+        int h = Math.min(cellHeight, finalSize.height);
 
         int x = (cellWidth - w) / 2;
         int y = (cellHeight - h) / 2;
 
+        if (entry.yPosition() != null) {
+            double yHeight = type.yOffset(entry, h) / (double) h;
+            y += (int) Math.round(entry.yPosition() * yHeight);
+            y = Math.max(0, Math.min(y, cellHeight - h));
+        }
+
         return new Rectangle(x, y, w, h);
     }
 
-    private record ResolvedIcon(IconEntry entry, BufferedImage image) {}
+    private record ResolvedIcon(IconEntry entry, BufferedImage image, IconsType type) {}
 }

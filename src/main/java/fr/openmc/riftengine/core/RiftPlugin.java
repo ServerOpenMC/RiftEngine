@@ -34,8 +34,9 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
 
     @Getter
     private RiftConfig riftConfig;
+    public final Path CONFIG_FOLDER = getDataFolder().toPath().resolve("config");
 
-    private List<Object> commands = new ArrayList<>(List.of(
+    private final List<Object> commands = new ArrayList<>(List.of(
             new GlyphCommand()
     ));
 
@@ -100,7 +101,7 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
 
         event.register(pack, PriorityOption.HIGHEST);
 
-        OMCLogger.successFormatted("RiftEngine: pack registered !");
+        OMCLogger.successFormatted("RiftEngine: pack enregistré !");
     }
 
     public void registerListener(Listener... listeners) {
