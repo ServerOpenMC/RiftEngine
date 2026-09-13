@@ -1,4 +1,4 @@
-package fr.openmc.riftengine.core.converter.writers.font;
+package fr.openmc.riftengine.core.converter.writers.glyph.font;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,15 +50,17 @@ public class FontWriter implements PackWriter {
                         String file = IdentifierUtils.normalizeId(provider.get("file").getAsString());
 
                         fontNamespace = file.split(":")[0];
-                        fontId = file.split(":")[1]
-                                .replace("font/", "")
-                                .replace(".png", "");
-                        fontPng = javaRootPath
-                                .resolve("assets")
-                                .resolve(file.split(":")[0])
-                                .resolve("textures")
-                                .resolve(file.split(":")[1])
-                                .toFile();
+
+                        if (file.split(":").length == 2) {
+                            fontId = file.split(":")[1]
+                                    .replace("font/", "")
+                                    .replace(".png", "");
+                        } else {
+                            fontId = file
+                                    .replace("font/", "")
+                                    .replace(".png", "");
+                        }
+                        fontPng = IdentifierUtils.resolveTextureId(javaRootPath, file).toFile();
                         fontsChar = provider.getAsJsonArray("chars");
                     }
                 }
