@@ -1,13 +1,14 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
+import fr.openmc.core.OMCRegistry;
 import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.riftengine.api.scanner.icons.IconEntry;
+import fr.openmc.riftengine.api.scanner.icons.IconScanner;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
 import fr.openmc.riftengine.core.registry.glyphs.types.IconGlyph;
-import fr.openmc.riftengine.core.scanner.icons.IconEntry;
-import fr.openmc.riftengine.core.scanner.icons.IconScanner;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -36,7 +37,7 @@ public class IconsWriter implements PackWriter {
         IconsTypeConfig forcedType = IconsTypeConfig.load(RiftPlugin.getInstance().CONFIG_FOLDER
                 .resolve("icons_types.yml"));
 
-        IconScanner scanner = RiftRegistry.SCANNERS.ICONS;
+        IconScanner scanner = OMCRegistry.SCANNERS.ICONS;
         List<IconEntry> entries;
         try {
             entries = scanner.scan(itemsAdderContentsPath);

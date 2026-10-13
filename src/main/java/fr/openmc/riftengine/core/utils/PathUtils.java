@@ -18,13 +18,6 @@ public class PathUtils {
         return reducedPath;
     }
 
-    public static Path getItemsAdderPath(Path dataPath) {
-        File pluginsDir = dataPath.toFile().getParentFile(); // * root/plugins
-        File itemsAdderDir = new File(pluginsDir, "ItemsAdder"); // * root/plugins/ItemsAdder
-
-        return itemsAdderDir.toPath();
-    }
-
     public static Path getGeyserPath(Path dataPath) {
         File pluginsDir = dataPath.toFile().getParentFile(); // * root/plugins
         File geyserDir = new File(pluginsDir, "Geyser-Spigot"); // * root/plugins/Geyser-Spigot

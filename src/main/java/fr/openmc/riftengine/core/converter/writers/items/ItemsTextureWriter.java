@@ -1,12 +1,8 @@
 package fr.openmc.riftengine.core.converter.writers.items;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
-import fr.openmc.riftengine.core.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.utils.PathUtils;
 
@@ -26,7 +22,8 @@ public class ItemsTextureWriter implements PackWriter {
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws IOException {
         for (ItemEntry itemEntry : items) {
-            String ressouceId = itemEntry.getBestResourceId();
+            // todo: supporter la liste des textures pour les choses comment fishing rod et
+            String ressouceId = itemEntry.getBestResourcesId().stream().findFirst().get();
             if (ressouceId == null) {
                 OMCLogger.warn("Item {} a pas de resource id", itemEntry.namespacedId());
                 continue;
@@ -34,7 +31,7 @@ public class ItemsTextureWriter implements PackWriter {
 
             if (ressouceId.split(":")[0].equals("minecraft")) continue;
 
-            Path resourcePath = itemEntry.getResourcePath().apply(javaRootPath);
+            Path resourcePath = itemEntry.getResourcePath().apply(javaRootPath).stream().findFirst().get();
             if (resourcePath == null) {
                 OMCLogger.warn("Item {} a aucune resource (Model ou texture)", itemEntry.namespacedId());
                 continue;

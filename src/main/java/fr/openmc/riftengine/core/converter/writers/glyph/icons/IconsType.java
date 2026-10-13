@@ -1,6 +1,6 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
-import fr.openmc.riftengine.core.scanner.icons.IconEntry;
+import fr.openmc.riftengine.api.scanner.icons.IconEntry;
 
 import java.awt.*;
 

@@ -2,22 +2,18 @@ package fr.openmc.riftengine.core.converter.writers.items;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
-import fr.openmc.riftengine.core.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.utils.PathUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Locale;
 
 public class ItemsTextureJsonWriter implements PackWriter {
     private final List<ItemEntry> items;
@@ -35,7 +31,8 @@ public class ItemsTextureJsonWriter implements PackWriter {
         JsonObject textureData = new JsonObject();
 
         for (ItemEntry itemEntry : items) {
-            String resourceId = itemEntry.getBestResourceId();
+            // todo: supporter la liste des textures pour les choses comment fishing rod et tt
+            String resourceId = itemEntry.getBestResourcesId().stream().findFirst().get();
             String texture = null;
 
             if (resourceId == null) {
@@ -44,7 +41,7 @@ public class ItemsTextureJsonWriter implements PackWriter {
                 String path = IdentifierUtils.normalizeId(resourceId).split(":", 2)[1];
                 texture = IdentifierUtils.toBedrockTexturePath("textures/" + path);
             } else {
-                Path resourcePath = itemEntry.getResourcePath().apply(javaRootPath);
+                Path resourcePath = itemEntry.getResourcePath().apply(javaRootPath).stream().findFirst().get();
                 Path reducedPath = resourcePath == null ? null
                         : PathUtils.getPathFromRoot(resourcePath, "textures");
                 if (reducedPath != null) {

@@ -4,21 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.RiftPlugin;
-import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
-import fr.openmc.riftengine.core.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.utils.PathUtils;
-import org.bukkit.Material;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 

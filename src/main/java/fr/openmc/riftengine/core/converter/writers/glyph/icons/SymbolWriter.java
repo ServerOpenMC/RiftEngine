@@ -1,13 +1,13 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
 import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.core.utils.YmlUtils;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.listeners.LoadAfterItemsAdderListener;
 import fr.openmc.riftengine.core.registry.glyphs.Glyph;
 import fr.openmc.riftengine.core.registry.glyphs.types.IconGlyph;
-import fr.openmc.riftengine.core.utils.YmlUtils;
 import org.bukkit.Bukkit;
 import org.yaml.snakeyaml.Yaml;
 
