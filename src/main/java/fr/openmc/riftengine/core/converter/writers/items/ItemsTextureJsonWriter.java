@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class ItemsTextureJsonWriter implements PackWriter {
     private final List<ItemEntry> items;
@@ -32,18 +34,35 @@ public class ItemsTextureJsonWriter implements PackWriter {
 
         for (ItemEntry itemEntry : items) {
             // todo: supporter la liste des textures pour les choses comment fishing rod et tt
-            String resourceId = itemEntry.getBestResourcesId().stream().findFirst().get();
+            Set<String> bestResources = itemEntry.getBestResourcesId();
+            if (bestResources == null) {
+                OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+                continue;
+            }
+
+            Optional<String> resourceId = bestResources.stream().findFirst();
             String texture = null;
 
-            if (resourceId == null) {
+            if (resourceId.isEmpty()) {
                 texture = "textures/items/" + itemEntry.getMaterial().name().toLowerCase();;
-            } else if (resourceId.startsWith("minecraft:")) {
-                String path = IdentifierUtils.normalizeId(resourceId).split(":", 2)[1];
+            } else if (resourceId.get().startsWith("minecraft:")) {
+                String path = IdentifierUtils.normalizeId(resourceId.get()).split(":", 2)[1];
                 texture = IdentifierUtils.toBedrockTexturePath("textures/" + path);
             } else {
-                Path resourcePath = itemEntry.getResourcePath().apply(javaRootPath).stream().findFirst().get();
-                Path reducedPath = resourcePath == null ? null
-                        : PathUtils.getPathFromRoot(resourcePath, "textures");
+                Set<Path> resources = itemEntry.getResourcePath().apply(javaRootPath);
+                if (resources == null) {
+                    OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+                    continue;
+                }
+
+                Optional<Path> resourcePath = resources.stream().findFirst();
+                if (resourcePath.isEmpty()) {
+                    // todo: en vrai faire un systeme plus propre d'erreur genre on def ttes les erreurs dans une classe, on les appelle ici et paf, au lieu de dupliquer du texte
+                    OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+                    continue;
+                }
+                Path reducedPath = resourcePath.isEmpty() ? null
+                        : PathUtils.getPathFromRoot(resourcePath.get(), "textures");
                 if (reducedPath != null) {
                     texture = IdentifierUtils.toBedrockTexturePath(reducedPath.toString())
                             .replaceFirst("\\.[^/.]+$", "");
