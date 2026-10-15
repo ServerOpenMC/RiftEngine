@@ -6,7 +6,6 @@ import fr.openmc.core.bootstrap.registries.LifecycleRegistry;
 import fr.openmc.core.bootstrap.registries.RegistryContext;
 import fr.openmc.core.bootstrap.registries.RegistryLoadingType;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
-import fr.openmc.riftengine.core.registry.scanner.ScannerRegistry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,16 +14,12 @@ import java.util.List;
 public final class RiftRegistry {
     // * Registre globaux
     public static GlyphsRegistry GLYPHS;
-    public static ScannerRegistry SCANNERS;
 
     private static final List<LifecycleRegistry> LOADED = new ArrayList<>();
 
     private static final List<RegistryContext> ALL = List.of(
             new RegistryContext(
                     () -> GLYPHS = new GlyphsRegistry(),
-                    RegistryLoadingType.RUNTIME),
-            new RegistryContext(
-                    () -> SCANNERS = new ScannerRegistry(),
                     RegistryLoadingType.RUNTIME)
     );
 

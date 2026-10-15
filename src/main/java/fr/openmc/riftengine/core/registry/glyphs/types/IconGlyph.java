@@ -1,7 +1,7 @@
 package fr.openmc.riftengine.core.registry.glyphs.types;
 
+import fr.openmc.riftengine.api.scanner.icons.IconEntry;
 import fr.openmc.riftengine.core.registry.glyphs.Glyph;
-import fr.openmc.riftengine.core.scanner.icons.IconEntry;
 import lombok.Getter;
 
 @Getter

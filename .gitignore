@@ -134,3 +134,6 @@ spigot.yml
 .settings/
 bin/
 !libs/
+
+# local.properties
+local.properties

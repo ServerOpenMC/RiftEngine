@@ -1,6 +1,6 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
-import fr.openmc.riftengine.core.scanner.icons.IconEntry;
+import fr.openmc.riftengine.api.scanner.icons.IconEntry;
 
 import java.awt.*;
 
@@ -78,6 +78,25 @@ public enum IconsType {
         @Override
         public int yOffset(IconEntry entry, int height) {
             return entry.yPosition() != null ? entry.yPosition() : DEFAULT_Y_OFFSET;
+        }
+    },
+
+
+    // todo: faire un EMOJI_{x} avec x un entier
+    EMOJI_13 {
+        @Override
+        public boolean matches(int width, int height) {
+            return false; // a detecter manuellement via config/icons_type.yml
+        }
+
+        @Override
+        public Dimension finalSize(IconEntry entry, int width, int height) {
+            return new Dimension(13, 13);
+        }
+
+        @Override
+        public int yOffset(IconEntry entry, int height) {
+            return entry.yPosition() != null ? -entry.yPosition() : DEFAULT_Y_OFFSET;
         }
     },
 

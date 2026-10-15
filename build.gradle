@@ -39,3 +39,27 @@ processResources {
         expand(pluginProps)
     }
 }
+
+// * Propriété locale
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream {
+        localProperties.load(it)
+    }
+}
+
+tasks.jar {
+    destinationDirectory.set(file('./builds/'))
+}
+
+tasks.register('copyJarToServer', Copy) {
+    dependsOn tasks.jar
+
+    from tasks.jar
+
+    if (localProperties.getProperty('minecraftServerDir')) {
+        into file("${localProperties.getProperty('minecraftServerDir')}/plugins")
+    }
+}
