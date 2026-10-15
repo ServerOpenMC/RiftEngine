@@ -35,7 +35,7 @@ public class IconsWriter implements PackWriter {
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws IOException {
         IconsTypeConfig forcedType = IconsTypeConfig.load(RiftPlugin.getInstance().CONFIG_FOLDER
-                .resolve("icons_types.yml"));
+                .resolve("icons_types.yml")); // todo: degeu ça
 
         IconScanner scanner = OMCRegistry.SCANNERS.ICONS;
         List<IconEntry> entries;
