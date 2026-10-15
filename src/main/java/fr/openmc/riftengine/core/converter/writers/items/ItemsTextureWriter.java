@@ -11,8 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 
 public class ItemsTextureWriter implements PackWriter {
     private final List<ItemEntry> items;
@@ -24,43 +23,46 @@ public class ItemsTextureWriter implements PackWriter {
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws IOException {
         for (ItemEntry itemEntry : items) {
-            Set<String> resources = itemEntry.getBestResourcesId();
-
-            if (resources == null) {
-                OMCLogger.warn("Item {} a pas de resource id", itemEntry.namespacedId());
+            Map<String, String> bestResources = itemEntry.getBestResourcesId();
+            if (bestResources == null) {
+                OMCLogger.warn("Item {} : n'a pas de best resources", itemEntry.namespacedId());
                 continue;
             }
 
-            // todo: supporter la liste des textures pour les choses comment fishing rod et
-            Optional<String> ressouceId = resources.stream().findFirst();
-            if (ressouceId.isEmpty()) {
-                OMCLogger.warn("Item {} a pas de resource id", itemEntry.namespacedId());
-                continue;
-            }
+            for (var entry : bestResources.entrySet()) {
+                String stateResource = entry.getKey();
+                String resourceId = entry.getValue();
 
-            if (ressouceId.get().split(":")[0].equals("minecraft")) continue;
+                if (resourceId.isEmpty()) {
+                    OMCLogger.warn("Item {} a pas de resource id", itemEntry.namespacedId());
+                    continue;
+                }
 
-            Set<Path> resources1 = itemEntry.getResourcePath().apply(javaRootPath);
-            if (resources1 == null) {
-                OMCLogger.warn("Item {} a aucune resource (Model ou texture)", itemEntry.namespacedId());
-                continue;
-            }
-            Optional<Path> resourcePath = resources1.stream().findFirst();
-            if (resourcePath.isEmpty()) {
-                OMCLogger.warn("Item {} a aucune resource (Model ou texture)", itemEntry.namespacedId());
-                continue;
-            }
+                if (resourceId.split(":")[0].equals("minecraft")) continue;
 
-            Path reducedPath = PathUtils.getPathFromRoot(resourcePath.get(), "textures");
-            if (reducedPath == null) {
-                OMCLogger.warn("Item {} a un Path impossible a réduire {}", itemEntry.namespacedId(), resourcePath.toString());
-                continue;
-            }
+                Map<String, Path> resources = itemEntry.getResourcePath().apply(javaRootPath);
+                if (resources == null) {
+                    OMCLogger.warn("Item {} a aucune resource (Model ou texture)", itemEntry.namespacedId());
+                    continue;
+                }
 
-            Path outputFile = bedrockRootPath.resolve(
-                    IdentifierUtils.toBedrockTexturePath(reducedPath.toString()));
-            Files.createDirectories(outputFile.getParent());
-            Files.copy(resourcePath.get(), outputFile, StandardCopyOption.REPLACE_EXISTING);
+                Path resourcePath = resources.get(stateResource);
+                if (resourcePath == null) {
+                    OMCLogger.warn("Item {} a aucune resource (Model ou texture)", itemEntry.namespacedId());
+                    continue;
+                }
+
+                Path reducedPath = PathUtils.getPathFromRoot(resourcePath, "textures");
+                if (reducedPath == null) {
+                    OMCLogger.warn("Item {} a un Path impossible a réduire {}", itemEntry.namespacedId(), resourcePath.toString());
+                    continue;
+                }
+
+                Path outputFile = bedrockRootPath.resolve(
+                        IdentifierUtils.toBedrockTexturePath(reducedPath.toString()));
+                Files.createDirectories(outputFile.getParent());
+                Files.copy(resourcePath, outputFile, StandardCopyOption.REPLACE_EXISTING);
+            }
         }
     }
 }

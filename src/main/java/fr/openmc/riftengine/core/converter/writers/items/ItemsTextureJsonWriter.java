@@ -14,9 +14,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 
+/**
+ * Ecrit le item_texture.json qui sert grosso modo a relier les textures aux items (une ref = une resource)
+ */
 public class ItemsTextureJsonWriter implements PackWriter {
     private final List<ItemEntry> items;
 
@@ -33,50 +35,24 @@ public class ItemsTextureJsonWriter implements PackWriter {
         JsonObject textureData = new JsonObject();
 
         for (ItemEntry itemEntry : items) {
-            // todo: supporter la liste des textures pour les choses comment fishing rod et tt
-            Set<String> bestResources = itemEntry.getBestResourcesId();
+            Map<String, String> bestResources = itemEntry.getBestResourcesId();
             if (bestResources == null) {
-                OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+                OMCLogger.warn("Item {} : n'a pas de best resources", itemEntry.namespacedId());
                 continue;
             }
 
-            Optional<String> resourceId = bestResources.stream().findFirst();
-            String texture = null;
+            for (var entry : bestResources.entrySet()) {
+                String[] textureDataStr = getTextureData(itemEntry, entry.getKey(), entry.getValue(), javaRootPath);
 
-            if (resourceId.isEmpty()) {
-                texture = "textures/items/" + itemEntry.getMaterial().name().toLowerCase();;
-            } else if (resourceId.get().startsWith("minecraft:")) {
-                String path = IdentifierUtils.normalizeId(resourceId.get()).split(":", 2)[1];
-                texture = IdentifierUtils.toBedrockTexturePath("textures/" + path);
-            } else {
-                Set<Path> resources = itemEntry.getResourcePath().apply(javaRootPath);
-                if (resources == null) {
-                    OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+                if (textureDataStr == null) {
+                    OMCLogger.warn("Item {} : textureDataStr n'a pas de contenu", itemEntry.namespacedId());
                     continue;
                 }
 
-                Optional<Path> resourcePath = resources.stream().findFirst();
-                if (resourcePath.isEmpty()) {
-                    // todo: en vrai faire un systeme plus propre d'erreur genre on def ttes les erreurs dans une classe, on les appelle ici et paf, au lieu de dupliquer du texte
-                    OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
-                    continue;
-                }
-                Path reducedPath = resourcePath.isEmpty() ? null
-                        : PathUtils.getPathFromRoot(resourcePath.get(), "textures");
-                if (reducedPath != null) {
-                    texture = IdentifierUtils.toBedrockTexturePath(reducedPath.toString())
-                            .replaceFirst("\\.[^/.]+$", "");
-                }
+                JsonObject itemData = new JsonObject();
+                itemData.addProperty("textures", textureDataStr[1]);
+                textureData.add(textureDataStr[0], itemData);
             }
-
-            if (texture == null) {
-                OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
-                continue;
-            }
-
-            JsonObject itemData = new JsonObject();
-            itemData.addProperty("textures", texture);
-            textureData.add(itemEntry.namespacedId(), itemData);
         }
 
         root.addProperty("texture_name", "atlas.items");
@@ -85,5 +61,56 @@ public class ItemsTextureJsonWriter implements PackWriter {
         Path outputFile = bedrockRootPath.resolve("textures").resolve("item_texture.json");
         Files.createDirectories(outputFile.getParent());
         Files.writeString(outputFile, GSON.toJson(root), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Retourne les id du namespace et de la resource
+     * (en fonction de si y'a des textures multiples ect fishing rod)
+     * Note a moi meme:
+     * - le state normal est skip, a ma vue c'est le state par défaut
+     */
+    public String[] getTextureData(ItemEntry itemEntry, String stateResource, String resourceId, Path javaRootPath) {
+        String texture = null;
+        String namespace = itemEntry.namespacedId();
+
+        if (resourceId.isEmpty()) {
+            texture = "textures/items/" + itemEntry.getMaterial().name().toLowerCase();;
+        } else if (resourceId.startsWith("minecraft:")) {
+            String path = IdentifierUtils.normalizeId(resourceId).split(":", 2)[1];
+            texture = IdentifierUtils.toBedrockTexturePath("textures/" + path);
+        } else {
+            Map<String, Path> resources = itemEntry.getResourcePath().apply(javaRootPath);
+            if (resources == null) {
+                OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+                return null;
+            }
+
+            if (resources.isEmpty()) {
+                OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+                return null;
+            }
+
+            Path resourcePath;
+            if (resources.size() > 1) {
+                resourcePath = resources.get(stateResource);
+                if (!stateResource.equals("normal"))
+                    namespace = itemEntry.namespacedId() + "_" + stateResource;
+            } else {
+                resourcePath = resources.values().stream().findFirst().get();
+            }
+
+            Path reducedPath = PathUtils.getPathFromRoot(resourcePath, "textures");
+            if (reducedPath != null) {
+                texture = IdentifierUtils.toBedrockTexturePath(reducedPath.toString())
+                        .replaceFirst("\\.[^/.]+$", "");
+            }
+        }
+
+        if (texture == null) {
+            OMCLogger.warn("Item {} : impossible de déterminer la texture", itemEntry.namespacedId());
+            return null;
+        }
+
+        return new String[] {namespace, texture};
     }
 }
