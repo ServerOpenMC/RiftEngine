@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ManifestWriter implements PackWriter {
+    public static final String PACK_NAME = "RiftPack";
 
     private final PackIdentity identity;
 
@@ -23,7 +24,7 @@ public class ManifestWriter implements PackWriter {
             {
               "format_version": 2,
               "header": {
-                "name": "RiftPack",
+                "name": "%s",
                 "description": "Généré par RiftEngine à partir de celui de Java",
                 "uuid": "%s",
                 "version": %s,
@@ -37,7 +38,7 @@ public class ManifestWriter implements PackWriter {
                 }
               ]
             }
-            """.formatted(identity.headerUuid(), versionJson, identity.moduleUuid(), versionJson);
+            """.formatted(PACK_NAME, identity.headerUuid(), versionJson, identity.moduleUuid(), versionJson);
 
         Files.writeString(bedrockRootPath.resolve("manifest.json"), manifest, StandardCharsets.UTF_8);
 

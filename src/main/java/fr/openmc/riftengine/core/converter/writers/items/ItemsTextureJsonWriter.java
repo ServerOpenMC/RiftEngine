@@ -71,7 +71,7 @@ public class ItemsTextureJsonWriter implements PackWriter {
      */
     public String[] getTextureData(ItemEntry itemEntry, String stateResource, String resourceId, Path javaRootPath) {
         String texture = null;
-        String namespace = itemEntry.namespacedId();
+        String namespace = itemEntry.getKey();
 
         if (resourceId.isEmpty()) {
             texture = "textures/items/" + itemEntry.getMaterial().name().toLowerCase();;
@@ -93,8 +93,8 @@ public class ItemsTextureJsonWriter implements PackWriter {
             Path resourcePath;
             if (resources.size() > 1) {
                 resourcePath = resources.get(stateResource);
-                if (!stateResource.equals("normal"))
-                    namespace = itemEntry.namespacedId() + "_" + stateResource;
+                if (!stateResource.equals(ItemEntry.DEFAULT_STATE))
+                    namespace = itemEntry.getKey() + "_" + stateResource;
             } else {
                 resourcePath = resources.values().stream().findFirst().get();
             }

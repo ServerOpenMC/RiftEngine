@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+// todo: clean les writer et tt qui néccesite du Yml a adapter au max avec nos YmlUtils dans le plugin OpenMC
 public class RiftPlugin extends JavaPlugin implements EventRegistrar {
     @Getter
     private static RiftPlugin instance;

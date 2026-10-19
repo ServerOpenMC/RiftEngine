@@ -24,6 +24,13 @@ public class IdentifierUtils {
         return defaultNamespace + ":" + id;
     }
 
+    public static String removeNamespace(String namespacedId) {
+        String[] splited = namespacedId.split(":");
+        if (splited.length != 2) return namespacedId;
+
+        return splited[1];
+    }
+
     /**
      * Résout un identifiant en un chemin de fichier dans les assets
      */

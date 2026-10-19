@@ -8,6 +8,8 @@ import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.RiftConfig;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
+import fr.openmc.riftengine.core.converter.writers.blocks.BlocksMappingWriter;
+import fr.openmc.riftengine.core.converter.writers.blocks.TerrainTextureJsonWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.font.FontWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.icons.IconsWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.icons.SymbolWriter;
@@ -56,7 +58,11 @@ public class ConverterManager {
 
                     new ItemsTextureJsonWriter(items),
                     new ItemsTextureWriter(items),
-                    new ItemsMappingWriter(items)
+                    new ItemsMappingWriter(items),
+
+                    new TerrainTextureJsonWriter(items),
+                    new BlocksMappingWriter(items)
+
             ));
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors d'initialisation du ConverterManager", e);

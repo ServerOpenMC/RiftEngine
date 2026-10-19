@@ -60,7 +60,8 @@ public class ItemsMappingWriter implements PackWriter {
         root.add("items", itemsSetter);
 
         Path outputFile = PathUtils.getGeyserPath(RiftPlugin.getInstance().getDataPath())
-                .resolve("custom_mappings").resolve("ia-injected.json");
+                .resolve("custom_mappings").resolve("ia-items-injected.json");
+        Files.deleteIfExists(outputFile);
         Files.createDirectories(outputFile.getParent());
         Files.writeString(outputFile, GSON.toJson(root), StandardCharsets.UTF_8);
     }
@@ -75,11 +76,13 @@ public class ItemsMappingWriter implements PackWriter {
             def.addProperty("model", item.getNamespace() + ":ia_auto/" + item.getKey());
         }
 
-        def.addProperty("bedrock_identifier", item.namespacedId());
+        def.addProperty("bedrock_identifier", item.getKey());
 
-        JsonObject options = new JsonObject();
-        options.addProperty("icon", item.namespacedId());
-        def.add("bedrock_options", options);
+        if (item.getBehaviour().isItem()) {
+            JsonObject options = new JsonObject();
+            options.addProperty("icon", item.getKey());
+            def.add("bedrock_options", options);
+        }
 
         return def;
     }
@@ -100,7 +103,7 @@ public class ItemsMappingWriter implements PackWriter {
 
             String namespaceId = item.namespacedId();
 
-            if (!stateResource.equals("normal"))
+            if (!stateResource.equals(ItemEntry.DEFAULT_STATE))
                 namespaceId += "_" + stateResource;
 
             defObject.addProperty("bedrock_identifier", namespaceId);
@@ -111,7 +114,7 @@ public class ItemsMappingWriter implements PackWriter {
 
             // y'a 5 types de conditions (broken, damaged, custom_model_data, has_component, fishing_rod_cast),
             // note pour plus tard si ajout elytra
-            if (!stateResource.equals("normal") && item.getMaterial().equals(Material.FISHING_ROD)) {
+            if (!stateResource.equals(ItemEntry.DEFAULT_STATE) && item.getMaterial().equals(Material.FISHING_ROD)) {
                 options.addProperty("display_handheld", true);
                 JsonObject predicate = new JsonObject();
                 predicate.addProperty("type", "condition");
