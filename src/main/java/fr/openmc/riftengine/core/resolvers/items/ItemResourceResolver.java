@@ -1,7 +1,7 @@
 package fr.openmc.riftengine.core.resolvers.items;
 
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
-import fr.openmc.riftengine.core.RiftError;
+import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.registry.resolver.AbstractResolver;
 import fr.openmc.riftengine.core.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.utils.PathUtils;
@@ -18,7 +18,7 @@ public class ItemResourceResolver extends AbstractResolver<ItemEntry, List<Resol
         Map<String, String> resources = item.getBestResourcesId();
 
         if (resources == null || resources.isEmpty()) {
-            RiftError.ITEM_NOT_RESOURCE.send(item.namespacedId());
+            RiftLog.ITEM_NOT_RESOURCE.send(item.namespacedId());
             return List.of();
         }
 
@@ -31,6 +31,7 @@ public class ItemResourceResolver extends AbstractResolver<ItemEntry, List<Resol
             Path bedrockTexturePath = bedrockTexturePaths.get(state);
             String bedrockIdentifier = state.equals(ItemEntry.DEFAULT_STATE) ? item.getKey() : item.getKey() + "_" + state;
             String bedrockTextureValue = null;
+            String modelResourceId = item.getNamespace() + ":ia_auto/" + item.getKey();
 
             if (resourceId.isEmpty()) {
                 String folder = item.getBehaviour().isItem() ? "items" : "blocks";
@@ -46,7 +47,7 @@ public class ItemResourceResolver extends AbstractResolver<ItemEntry, List<Resol
                     resourcePath = bedrockTexturePaths.values().stream()
                             .findFirst().get();
                 } else {
-                    RiftError.RESOURCE_NOT_FOUND.send(item.getKey());
+                    RiftLog.RESOURCE_NOT_FOUND.send(item.getKey());
                     return List.of();
                 }
 
@@ -58,12 +59,12 @@ public class ItemResourceResolver extends AbstractResolver<ItemEntry, List<Resol
             }
 
             if (bedrockTextureValue == null) {
-                RiftError.RESOURCE_NOT_FOUND.send(item.getKey());
+                RiftLog.RESOURCE_NOT_FOUND.send(item.getKey());
                 return List.of();
             }
 
             resolved.add(new ResolvedItemResource(
-                    item, state, resourceId,
+                    item, state, resourceId, modelResourceId,
                     bedrockIdentifier, bedrockTexturePath, bedrockTextureValue));
         }
 

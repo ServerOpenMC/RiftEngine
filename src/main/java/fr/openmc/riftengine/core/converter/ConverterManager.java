@@ -31,7 +31,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-// todo: faire un converter manager clean, avec des systemes de step, (surtout du coté logger aussi)
 public class ConverterManager {
 
     private final RiftPlugin plugin;
@@ -43,33 +42,37 @@ public class ConverterManager {
         RiftConfig config = plugin.getRiftConfig();
         Path itemsAdderContents = getItemsAdderContents(plugin);
 
-        ItemResourceResolver resolver = RiftRegistry.RESOLVERS.ITEM_RESOURCE_RESOLVER;
-
         try {
             PackIdentity identity = PackIdentity.loadOrCreate(plugin);
             List<ItemEntry> items = OMCRegistry.SCANNERS.ITEMS.scan(itemsAdderContents);
-            writers.addAll(List.of(
-                    new IconWriter(),
-                    new ManifestWriter(identity),
+            ItemResourceResolver resolver = RiftRegistry.RESOLVERS.ITEM_RESOURCE_RESOLVER;
 
-                    new TranslationInjector(),
-                    new FontWriter(),
-                    new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock()),
+            register("Icônes", new IconWriter());
+            register("Manifest", new ManifestWriter(identity));
+            register("Traductions", new TranslationInjector());
+            register("Polices", new FontWriter());
 
-                    new IconsWriter(itemsAdderContents),
-                    new SymbolWriter(),
+            register("Scoreboard",
+                    new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock()));
 
-                    new ItemsTextureJsonWriter(items, resolver),
-                    new ItemsTextureWriter(items, resolver),
-                    new ItemsMappingWriter(items),
+            register("Icônes ItemsAdder", new IconsWriter(itemsAdderContents));
+            register("Mappings des symboles", new SymbolWriter());
 
-                    new TerrainTextureJsonWriter(identity, items, resolver),
-                    new BlocksMappingWriter(items, resolver)
+            register("Textures des items", new ItemsTextureJsonWriter(items, resolver));
+            register("Fichiers de textures", new ItemsTextureWriter(items, resolver));
+            register("Mappings des items", new ItemsMappingWriter(items, resolver));
 
-            ));
+            register("Textures des blocs",
+                    new TerrainTextureJsonWriter(identity, items, resolver));
+            register("Mappings des blocs", new BlocksMappingWriter(items, resolver));
+
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors d'initialisation du ConverterManager", e);
         }
+    }
+
+    private void register(String name, PackWriter writer) {
+        writers.add(new RegisteredPackWriter(name, writer));
     }
 
     /**

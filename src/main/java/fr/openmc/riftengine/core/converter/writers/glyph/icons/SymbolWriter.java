@@ -1,7 +1,7 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
-import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.core.utils.YmlUtils;
+import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
@@ -50,7 +50,7 @@ public class SymbolWriter implements PackWriter {
             for (IconGlyph icon : icons) {
                 Object entryObj = fontImagesMap.get(icon.getIcon().key());
                 if (!(entryObj instanceof Map<?, ?> entryMapRaw)) {
-                    OMCLogger.warnFormatted("Clé " + icon.getIcon().key() + " introuvable dans " + ymlFile + ".");
+                    RiftLog.SYMBOL_KEY_NOT_FOUND.send(icon.getIcon().key(), ymlFile);
                     continue;
                 }
 

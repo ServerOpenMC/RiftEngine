@@ -1,7 +1,6 @@
 package fr.openmc.riftengine.core;
 
 
-import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.core.bootstrap.registries.LifecycleRegistry;
 import fr.openmc.core.bootstrap.registries.RegistryContext;
 import fr.openmc.core.bootstrap.registries.RegistryLoadingType;
@@ -37,14 +36,15 @@ public final class RiftRegistry {
             LifecycleRegistry r = load(ctx);
 
             r.init();
-            OMCLogger.successFormatted("Registre {} chargé pendant le runtime", r.getClass().getSimpleName());
+
+            RiftLog.REGISTRY_LOADED.send(r.getClass().getSimpleName());
         }
     }
 
     public static void stopAll() {
         for (LifecycleRegistry r : LOADED) {
             r.stop();
-            OMCLogger.successFormatted("Registre {} stoppé", r.getClass().getSimpleName());
+            RiftLog.REGISTRY_DISABLE.send(r.getClass().getSimpleName());
         }
         LOADED.clear();
     }

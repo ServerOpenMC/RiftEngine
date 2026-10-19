@@ -1,7 +1,6 @@
 package fr.openmc.riftengine.core.converter.writers.blocks;
 
 import com.google.gson.JsonObject;
-import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.api.scanner.items.entry.behaviours.IABehaviour;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
@@ -34,10 +33,7 @@ public class TerrainTextureJsonWriter implements PackWriter {
 
         for (ItemEntry itemEntry : items) {
             IABehaviour behaviour = itemEntry.getBehaviour();
-            if (!behaviour.isBlock())  {
-                OMCLogger.warn("Item {} : n'a pas block", itemEntry.namespacedId());
-                continue;
-            }
+            if (!behaviour.isBlock()) continue;
 
             List<ResolvedItemResource> resolvedItemResources = resolver.resolve(javaRootPath, itemEntry);
 

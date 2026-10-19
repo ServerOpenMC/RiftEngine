@@ -7,9 +7,10 @@ import java.nio.file.Path;
 public record ResolvedItemResource(ItemEntry item,
                                    String state, // bottom, top, side
                                    String resourceId, // ex aywenite (sans le namespace devant), cloud_fishing_rod_cast
+                                   String modelResourceId, // ex omc_dream:ia_auto/dream_boot
                                    String bedrockIdentifier, //
                                    Path sourcePath,
-                                   String bedrockTexturePath// ex textures/aywenite
+                                   String bedrockTexturePath // ex textures/aywenite
                                    ) {
     public String bedrockIdWithState(String state) {
         return state.equals(ItemEntry.DEFAULT_STATE) ? item.getKey() : (item.getKey() + "_" + state);

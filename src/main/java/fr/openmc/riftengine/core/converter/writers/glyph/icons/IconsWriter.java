@@ -1,9 +1,9 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
 import fr.openmc.core.OMCRegistry;
-import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.riftengine.api.scanner.icons.IconEntry;
 import fr.openmc.riftengine.api.scanner.icons.IconScanner;
+import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
@@ -51,7 +51,7 @@ public class IconsWriter implements PackWriter {
             Path imagePath = entry.path().apply(javaRootPath);
 
             if (!Files.exists(imagePath)) {
-                OMCLogger.errorFormatted("Image introuvable pour " + entry.namespacedId() + " dans le path " + imagePath + " (skip)");
+                RiftLog.IMAGE_NOT_FOUND.send(entry.namespacedId(), imagePath);
                 skipped++;
                 continue;
             }
@@ -60,13 +60,13 @@ public class IconsWriter implements PackWriter {
             try {
                 image = ImageIO.read(imagePath.toFile());
             } catch (IOException e) {
-                OMCLogger.errorFormatted("Erreur de lecture pour " + entry.namespacedId() + " (skip) : " + e.getMessage());
+                RiftLog.ERROR_READING.send(entry.namespacedId());
                 skipped++;
                 continue;
             }
 
             if (image == null) {
-                OMCLogger.errorFormatted("Image non lisible pour " + entry.namespacedId() + " (skip)");
+                RiftLog.ERROR_READING.send(entry.namespacedId());
                 skipped++;
                 continue;
             }
@@ -77,7 +77,7 @@ public class IconsWriter implements PackWriter {
             }
 
             if (type.equals(IconsType.MENU_GUI)) {
-                OMCLogger.warnFormatted("Glyph " + entry.namespacedId() + " detécté comme MENU_GUI, il ne sera donc pas en glyph, vu que les menus sont géré autrement");
+                RiftLog.DETECTED_AS_MENU_GUI.send(entry.namespacedId());
                 continue;
             }
 
@@ -85,7 +85,7 @@ public class IconsWriter implements PackWriter {
         }
 
         if (skipped > 0) {
-            OMCLogger.errorFormatted("Image manquante pour " + skipped + " emoji(s)/icon(s) sur " + entries.size() + ".");
+            RiftLog.ICON_SKIPPED.send(skipped, entries.size());
         }
 
         if (resolved.isEmpty()) return;
@@ -134,9 +134,7 @@ public class IconsWriter implements PackWriter {
                 int col = i % GlyphsRegistry.GRID_SIZE;
 
                 IconsType type = resolvedEmoji.type();
-                OMCLogger.infoFormatted(resolvedEmoji.entry().namespacedId() + " ("
-                        + resolvedEmoji.image().getWidth() + "x" + resolvedEmoji.image().getHeight()
-                        + ") détecté comme " + type);
+                RiftLog.DETECTED_AS.send(resolvedEmoji.entry().namespacedId(), resolvedEmoji.image().getWidth(), resolvedEmoji.image().getHeight(), type);
 
                 Rectangle placement = centerImage(resolvedEmoji.image(), cellWidth, cellHeight, resolvedEmoji.entry(), type);
                 imageEditable.drawImage(

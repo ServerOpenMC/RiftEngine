@@ -1,6 +1,6 @@
 package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
-import fr.openmc.core.bootstrap.integration.OMCLogger;
+import fr.openmc.riftengine.core.RiftLog;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class IconsTypeConfig {
                 try {
                     overrides.put(namespacedId, IconsType.valueOf(typeName.trim().toUpperCase()));
                 } catch (IllegalArgumentException e) {
-                    OMCLogger.errorFormatted("Type inconnu pour " + namespacedId + " : " + typeName + " (skip)");
+                    RiftLog.ICON_TYPE_NOT_RECOGNIZED.send(namespacedId, typeName);
                 }
             }
         }
