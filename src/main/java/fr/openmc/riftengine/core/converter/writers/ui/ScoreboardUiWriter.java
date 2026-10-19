@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class ScoreboardUiWriter implements PackWriter {
+    private static final String OUTPUT_FILE = "ui/scoreboards.json";
     private final boolean hideScoreboardNumberBedrock;
 
     public ScoreboardUiWriter(boolean hideScoreboardNumberBedrock) {
@@ -23,9 +24,7 @@ public class ScoreboardUiWriter implements PackWriter {
         visible.addProperty("visible", false);
         root.add("scoreboard_sidebar_score", visible);
 
-        Path outputFile = bedrockRootPath
-                .resolve("ui")
-                .resolve("scoreboards.json");
+        Path outputFile = bedrockRootPath.resolve(OUTPUT_FILE);
         this.writeJsonFile(outputFile, root);
     }
 }

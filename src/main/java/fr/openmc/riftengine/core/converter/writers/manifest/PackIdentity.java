@@ -12,6 +12,7 @@ import static fr.openmc.riftengine.core.RiftPlugin.RP_VERSION;
 
 @Getter
 public class PackIdentity {
+    private static final String FILE_NAME = "pack-identity.yml";
 
     private final String packName;
     private final UUID headerUuid;
@@ -26,7 +27,7 @@ public class PackIdentity {
     }
 
     public static PackIdentity loadOrCreate(JavaPlugin plugin) throws IOException {
-        File file = new File(plugin.getDataFolder(), "pack-identity.yml");
+        File file = new File(plugin.getDataFolder(), FILE_NAME);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         if (!config.contains("header-uuid")) {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class ManifestWriter implements PackWriter {
+    private static final String OUTPUT_FILE = "manifest.json";
     private final PackIdentity identity;
 
     public ManifestWriter(PackIdentity identity) {
@@ -36,6 +37,6 @@ public class ManifestWriter implements PackWriter {
             }
             """.formatted(identity.getPackName(), identity.getHeaderUuid(), versionJson, identity.getModuleUuid(), versionJson);
 
-        this.writeFile(bedrockRootPath.resolve("manifest.json"), manifest);
+        this.writeFile(bedrockRootPath.resolve(OUTPUT_FILE), manifest);
     }
 }

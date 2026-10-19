@@ -19,6 +19,7 @@ import java.util.Map;
 public class ItemsMappingWriter implements PackWriter {
     private final List<ItemEntry> items;
     private final ItemResourceResolver resolver;
+    private static final String OUTPUT_FILE = "custom_mappings/ia-items-injected.json";
 
     public ItemsMappingWriter(List<ItemEntry> items, ItemResourceResolver resolver) {
         this.items = items;
@@ -59,8 +60,7 @@ public class ItemsMappingWriter implements PackWriter {
         root.add("items", itemsSetter);
 
         Path outputFile = PathUtils.getGeyserPath(RiftPlugin.getInstance().getDataPath())
-                .resolve("custom_mappings")
-                .resolve("ia-items-injected.json");
+                .resolve(OUTPUT_FILE);
         Files.deleteIfExists(outputFile);
         this.writeJsonFile(outputFile, root);
     }

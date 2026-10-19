@@ -21,6 +21,7 @@ import java.util.Map;
 public class BlocksMappingWriter implements PackWriter {
     private final List<ItemEntry> items;
     private final ItemResourceResolver resolver;
+    private static final String OUTPUT_FILE = "custom_mappings/ia-blocks-injected.json";
 
     public BlocksMappingWriter(List<ItemEntry> items, ItemResourceResolver resolver) {
         this.items = items;
@@ -64,8 +65,7 @@ public class BlocksMappingWriter implements PackWriter {
 
         Path outputFile = PathUtils
                 .getGeyserPath(RiftPlugin.getInstance().getDataPath())
-                .resolve("custom_mappings")
-                .resolve("ia-blocks-injected.json");
+                .resolve(OUTPUT_FILE);
 
         Files.deleteIfExists(outputFile);
         this.writeJsonFile(outputFile, root);

@@ -16,6 +16,8 @@ import java.util.List;
 public class ItemsTextureJsonWriter implements PackWriter {
     private final List<ItemEntry> items;
     private final ItemResourceResolver resolver;
+    private static final String OUTPUT_FILE = "textures/item_texture.json";
+
 
     public ItemsTextureJsonWriter(List<ItemEntry> items, ItemResourceResolver resolver) {
         this.items = items;
@@ -40,7 +42,7 @@ public class ItemsTextureJsonWriter implements PackWriter {
         root.addProperty("texture_name", "atlas.items");
         root.add("texture_data", textureData);
 
-        Path outputFile = bedrockRootPath.resolve("textures").resolve("item_texture.json");
+        Path outputFile = bedrockRootPath.resolve(OUTPUT_FILE);
         this.writeJsonFile(outputFile, root);
     }
 }

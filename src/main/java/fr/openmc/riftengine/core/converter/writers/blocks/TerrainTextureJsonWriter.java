@@ -19,6 +19,7 @@ public class TerrainTextureJsonWriter implements PackWriter {
     private final PackIdentity packIdentity;
     private final List<ItemEntry> items;
     private final ItemResourceResolver resolver;
+    private static final String OUTPUT_FILE = "textures/terrain_texture.json";
 
     public TerrainTextureJsonWriter(PackIdentity packIdentity, List<ItemEntry> items, ItemResourceResolver resolver) {
         this.packIdentity = packIdentity;
@@ -50,9 +51,7 @@ public class TerrainTextureJsonWriter implements PackWriter {
         root.addProperty("num_mip_levels", 4);
         root.add("texture_data", textureData);
 
-        Path outputFile = bedrockRootPath
-                .resolve("textures")
-                .resolve("terrain_texture.json");
+        Path outputFile = bedrockRootPath.resolve(OUTPUT_FILE);
         this.writeJsonFile(outputFile, root);
     }
 }
