@@ -1,7 +1,5 @@
 package fr.openmc.riftengine.core.converter.writers.ui;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 
@@ -12,8 +10,6 @@ import java.nio.file.Path;
 
 public class ScoreboardUiWriter implements PackWriter {
     private final boolean hideScoreboardNumberBedrock;
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public ScoreboardUiWriter(boolean hideScoreboardNumberBedrock) {
         this.hideScoreboardNumberBedrock = hideScoreboardNumberBedrock;

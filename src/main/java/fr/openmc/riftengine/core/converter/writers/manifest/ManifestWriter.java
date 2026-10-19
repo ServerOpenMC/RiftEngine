@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ManifestWriter implements PackWriter {
-    public static final String PACK_NAME = "RiftPack";
-
     private final PackIdentity identity;
 
     public ManifestWriter(PackIdentity identity) {
@@ -18,7 +16,7 @@ public class ManifestWriter implements PackWriter {
 
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws IOException {
-        int[] v = identity.version();
+        int[] v = identity.getVersion();
         String versionJson = "[" + v[0] + ", " + v[1] + ", " + v[2] + "]";
         String manifest = """
             {
@@ -38,7 +36,7 @@ public class ManifestWriter implements PackWriter {
                 }
               ]
             }
-            """.formatted(PACK_NAME, identity.headerUuid(), versionJson, identity.moduleUuid(), versionJson);
+            """.formatted(identity.getPackName(), identity.getHeaderUuid(), versionJson, identity.getModuleUuid(), versionJson);
 
         Files.writeString(bedrockRootPath.resolve("manifest.json"), manifest, StandardCharsets.UTF_8);
 

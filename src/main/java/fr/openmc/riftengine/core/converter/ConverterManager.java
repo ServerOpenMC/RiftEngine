@@ -7,6 +7,7 @@ import fr.openmc.core.utils.ZipUtils;
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.RiftConfig;
 import fr.openmc.riftengine.core.RiftPlugin;
+import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.converter.writers.blocks.BlocksMappingWriter;
 import fr.openmc.riftengine.core.converter.writers.blocks.TerrainTextureJsonWriter;
@@ -21,6 +22,7 @@ import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
 import fr.openmc.riftengine.core.converter.writers.translations.TranslationInjector;
 import fr.openmc.riftengine.core.converter.writers.ui.ScoreboardUiWriter;
+import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -35,15 +37,16 @@ public class ConverterManager {
     private final RiftPlugin plugin;
 
     private final List<PackWriter> writers = new ArrayList<>();
-    private final PackIdentity identity;
 
     public ConverterManager(RiftPlugin plugin) {
         this.plugin = plugin;
         RiftConfig config = plugin.getRiftConfig();
         Path itemsAdderContents = getItemsAdderContents(plugin);
 
+        ItemResourceResolver resolver = RiftRegistry.RESOLVERS.ITEM_RESOURCE_RESOLVER;
+
         try {
-            identity = PackIdentity.loadOrCreate(plugin);
+            PackIdentity identity = PackIdentity.loadOrCreate(plugin);
             List<ItemEntry> items = OMCRegistry.SCANNERS.ITEMS.scan(itemsAdderContents);
             writers.addAll(List.of(
                     new IconWriter(),
@@ -56,12 +59,12 @@ public class ConverterManager {
                     new IconsWriter(itemsAdderContents),
                     new SymbolWriter(),
 
-                    new ItemsTextureJsonWriter(items),
-                    new ItemsTextureWriter(items),
+                    new ItemsTextureJsonWriter(items, resolver),
+                    new ItemsTextureWriter(items, resolver),
                     new ItemsMappingWriter(items),
 
-                    new TerrainTextureJsonWriter(items),
-                    new BlocksMappingWriter(items)
+                    new TerrainTextureJsonWriter(identity, items, resolver),
+                    new BlocksMappingWriter(items, resolver)
 
             ));
         } catch (Exception e) {

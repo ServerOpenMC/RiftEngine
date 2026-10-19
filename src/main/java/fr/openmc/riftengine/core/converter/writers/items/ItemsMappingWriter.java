@@ -1,7 +1,5 @@
 package fr.openmc.riftengine.core.converter.writers.items;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.openmc.core.bootstrap.integration.OMCLogger;
@@ -19,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ItemsMappingWriter implements PackWriter {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
     private final List<ItemEntry> items;
 
     public ItemsMappingWriter(List<ItemEntry> items) {
