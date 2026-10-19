@@ -3,12 +3,10 @@ package fr.openmc.riftengine.core.converter.writers.manifest;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ManifestWriter implements PackWriter {
-
+    private static final String OUTPUT_FILE = "manifest.json";
     private final PackIdentity identity;
 
     public ManifestWriter(PackIdentity identity) {
@@ -17,13 +15,13 @@ public class ManifestWriter implements PackWriter {
 
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws IOException {
-        int[] v = identity.version();
+        int[] v = identity.getVersion();
         String versionJson = "[" + v[0] + ", " + v[1] + ", " + v[2] + "]";
         String manifest = """
             {
               "format_version": 2,
               "header": {
-                "name": "RiftPack",
+                "name": "%s",
                 "description": "Généré par RiftEngine à partir de celui de Java",
                 "uuid": "%s",
                 "version": %s,
@@ -37,9 +35,8 @@ public class ManifestWriter implements PackWriter {
                 }
               ]
             }
-            """.formatted(identity.headerUuid(), versionJson, identity.moduleUuid(), versionJson);
+            """.formatted(identity.getPackName(), identity.getHeaderUuid(), versionJson, identity.getModuleUuid(), versionJson);
 
-        Files.writeString(bedrockRootPath.resolve("manifest.json"), manifest, StandardCharsets.UTF_8);
-
+        this.writeFile(bedrockRootPath.resolve(OUTPUT_FILE), manifest);
     }
 }

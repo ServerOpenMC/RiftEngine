@@ -8,7 +8,9 @@ import fr.openmc.riftengine.core.listeners.LoadAfterItemsAdderListener;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.geysermc.event.Event;
 import org.geysermc.geyser.api.GeyserApi;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+// todo: clean les writer et tt qui néccesite du Yml a adapter au max avec nos YmlUtils dans le plugin OpenMC
 public class RiftPlugin extends JavaPlugin implements EventRegistrar {
     @Getter
     private static RiftPlugin instance;
@@ -46,6 +49,8 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
     @Override
     public void onEnable() {
         instance = this;
+        logLoadMessage(this);
+
         try {
             riftConfig = new RiftConfig(this, this.getConfig());
         } catch (IOException e) {
@@ -71,16 +76,14 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
         }
 
         GlyphsRegistry glyphsRegistry = RiftRegistry.GLYPHS;
-        OMCLogger.info("RiftEngine activé!");
-        OMCLogger.infoFormatted(glyphsRegistry.size() + "/" + glyphsRegistry.maxSize() + " glyphs enregistré");
-        OMCLogger.infoFormatted("Glyphs : " + glyphsRegistry.values());
+        RiftLog.NUMBER_GLYPH_REGISTERED.send(glyphsRegistry.size(), glyphsRegistry.maxSize());
     }
 
     @Override
     public void onDisable() {
         RiftRegistry.stopAll();
 
-        OMCLogger.info("RiftEngine désactivé!");
+        RiftLog.RIFT_DISABLE.send();
     }
 
     public void updateBedrockResourcePack() {
@@ -95,13 +98,11 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
     public void onLoadResourcePacks(SessionLoadResourcePacksEvent event) {
         ResourcePack pack = RiftPlugin.getResourcePack();
 
-        OMCLogger.infoFormatted("RiftEngine pack = " + pack);
-
         if (pack == null) return;
 
         event.register(pack, PriorityOption.HIGHEST);
 
-        OMCLogger.successFormatted("RiftEngine: pack enregistré !");
+        RiftLog.RIFT_PACK_INFO.send(pack);
     }
 
     public void registerListener(Listener... listeners) {
@@ -111,5 +112,39 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
 
     public <T extends Event> void registerEvent(Class<T> listenerClass, Consumer<T> handler) {
         GeyserApi.api().eventBus().subscribe(this, listenerClass, handler);
+    }
+
+    public static void logLoadMessage(RiftPlugin plugin) {
+        RiftLog.logBanner(
+                plugin.getPluginMeta().getVersion(),
+                Bukkit.getName() + " " + Bukkit.getVersion(),
+                System.getProperty("java.version")
+        );
+
+        for (String dependency : plugin.getPluginMeta().getPluginDependencies()) {
+            logPluginStatus(dependency, false);
+        }
+
+        for (String dependency : plugin.getPluginMeta().getPluginSoftDependencies()) {
+            logPluginStatus(dependency, true);
+        }
+    }
+
+    /**
+     * Log l'état d'une dépendance (requise ou optionnelle).
+     *
+     * @param name Nom du plugin dépendance
+     * @param optional True si la dépendance est optionnelle
+     */
+    private static void logPluginStatus(String name, boolean optional) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
+        boolean enabled = plugin != null && plugin.isEnabled();
+
+        String icon = enabled ? "✔" : "✘";
+        String color = enabled ? "\u001B[32m" : "\u001B[31m";
+        String version = enabled ? " v" + plugin.getPluginMeta().getVersion() : "";
+        String label = optional ? " (facultatif)" : "";
+
+        OMCLogger.info("  {}{} {}{}{}\u001B[0m", color, icon, name, version, label);
     }
 }

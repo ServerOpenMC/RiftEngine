@@ -1,5 +1,6 @@
 package fr.openmc.riftengine.core.converter.writers.manifest;
 
+import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -9,32 +10,24 @@ import java.util.UUID;
 
 import static fr.openmc.riftengine.core.RiftPlugin.RP_VERSION;
 
+@Getter
 public class PackIdentity {
+    private static final String FILE_NAME = "pack-identity.yml";
 
+    private final String packName;
     private final UUID headerUuid;
     private final UUID moduleUuid;
     private final int[] version; // * [major, minor, patch]
 
-    private PackIdentity(UUID headerUuid, UUID moduleUuid, int[] version) {
+    private PackIdentity(String packName, UUID headerUuid, UUID moduleUuid, int[] version) {
+        this.packName = packName;
         this.headerUuid = headerUuid;
         this.moduleUuid = moduleUuid;
         this.version = version;
     }
 
-    public UUID headerUuid() {
-        return headerUuid;
-    }
-
-    public UUID moduleUuid() {
-        return moduleUuid;
-    }
-
-    public int[] version() {
-        return version;
-    }
-
     public static PackIdentity loadOrCreate(JavaPlugin plugin) throws IOException {
-        File file = new File(plugin.getDataFolder(), "pack-identity.yml");
+        File file = new File(plugin.getDataFolder(), FILE_NAME);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         if (!config.contains("header-uuid")) {
@@ -56,6 +49,7 @@ public class PackIdentity {
         config.save(file);
 
         return new PackIdentity(
+                "RiftPack",
                 UUID.fromString(config.getString("header-uuid")),
                 UUID.fromString(config.getString("module-uuid")),
                 new int[]{major, minor, patch}

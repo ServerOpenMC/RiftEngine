@@ -7,7 +7,10 @@ import fr.openmc.core.utils.ZipUtils;
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.core.RiftConfig;
 import fr.openmc.riftengine.core.RiftPlugin;
+import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
+import fr.openmc.riftengine.core.converter.writers.blocks.BlocksMappingWriter;
+import fr.openmc.riftengine.core.converter.writers.blocks.TerrainTextureJsonWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.font.FontWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.icons.IconsWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.icons.SymbolWriter;
@@ -19,6 +22,7 @@ import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
 import fr.openmc.riftengine.core.converter.writers.translations.TranslationInjector;
 import fr.openmc.riftengine.core.converter.writers.ui.ScoreboardUiWriter;
+import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -27,13 +31,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-// todo: faire un converter manager clean, avec des systemes de step, (surtout du coté logger aussi)
 public class ConverterManager {
 
     private final RiftPlugin plugin;
 
     private final List<PackWriter> writers = new ArrayList<>();
-    private final PackIdentity identity;
 
     public ConverterManager(RiftPlugin plugin) {
         this.plugin = plugin;
@@ -41,26 +43,36 @@ public class ConverterManager {
         Path itemsAdderContents = getItemsAdderContents(plugin);
 
         try {
-            identity = PackIdentity.loadOrCreate(plugin);
+            PackIdentity identity = PackIdentity.loadOrCreate(plugin);
             List<ItemEntry> items = OMCRegistry.SCANNERS.ITEMS.scan(itemsAdderContents);
-            writers.addAll(List.of(
-                    new IconWriter(),
-                    new ManifestWriter(identity),
+            ItemResourceResolver resolver = RiftRegistry.RESOLVERS.ITEM_RESOURCE_RESOLVER;
 
-                    new TranslationInjector(),
-                    new FontWriter(),
-                    new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock()),
+            register("Icônes", new IconWriter());
+            register("Manifest", new ManifestWriter(identity));
+            register("Traductions", new TranslationInjector());
+            register("Polices", new FontWriter());
 
-                    new IconsWriter(itemsAdderContents),
-                    new SymbolWriter(),
+            register("Scoreboard",
+                    new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock()));
 
-                    new ItemsTextureJsonWriter(items),
-                    new ItemsTextureWriter(items),
-                    new ItemsMappingWriter(items)
-            ));
+            register("Icônes ItemsAdder", new IconsWriter(itemsAdderContents));
+            register("Mappings des symboles", new SymbolWriter());
+
+            register("Textures des items", new ItemsTextureJsonWriter(items, resolver));
+            register("Fichiers de textures", new ItemsTextureWriter(items, resolver));
+            register("Mappings des items", new ItemsMappingWriter(items, resolver));
+
+            register("Textures des blocs",
+                    new TerrainTextureJsonWriter(identity, items, resolver));
+            register("Mappings des blocs", new BlocksMappingWriter(items, resolver));
+
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors d'initialisation du ConverterManager", e);
         }
+    }
+
+    private void register(String name, PackWriter writer) {
+        writers.add(new RegisteredPackWriter(name, writer));
     }
 
     /**

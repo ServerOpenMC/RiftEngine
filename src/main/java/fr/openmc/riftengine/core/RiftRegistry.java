@@ -1,11 +1,11 @@
 package fr.openmc.riftengine.core;
 
 
-import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.core.bootstrap.registries.LifecycleRegistry;
 import fr.openmc.core.bootstrap.registries.RegistryContext;
 import fr.openmc.core.bootstrap.registries.RegistryLoadingType;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
+import fr.openmc.riftengine.core.registry.resolver.ResolverRegistry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +14,16 @@ import java.util.List;
 public final class RiftRegistry {
     // * Registre globaux
     public static GlyphsRegistry GLYPHS;
+    public static ResolverRegistry RESOLVERS;
 
     private static final List<LifecycleRegistry> LOADED = new ArrayList<>();
 
     private static final List<RegistryContext> ALL = List.of(
             new RegistryContext(
                     () -> GLYPHS = new GlyphsRegistry(),
+                    RegistryLoadingType.RUNTIME),
+            new RegistryContext(
+                    () -> RESOLVERS = new ResolverRegistry(),
                     RegistryLoadingType.RUNTIME)
     );
 
@@ -32,14 +36,15 @@ public final class RiftRegistry {
             LifecycleRegistry r = load(ctx);
 
             r.init();
-            OMCLogger.successFormatted("Registre {} chargé pendant le runtime", r.getClass().getSimpleName());
+
+            RiftLog.REGISTRY_LOADED.send(r.getClass().getSimpleName());
         }
     }
 
     public static void stopAll() {
         for (LifecycleRegistry r : LOADED) {
             r.stop();
-            OMCLogger.successFormatted("Registre {} stoppé", r.getClass().getSimpleName());
+            RiftLog.REGISTRY_DISABLE.send(r.getClass().getSimpleName());
         }
         LOADED.clear();
     }

@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 /**
@@ -81,8 +80,7 @@ public class FontWriter implements PackWriter {
 
             String fileName = "glyph_" + page + ".png";
             Path glyphPath = bedrockRootPath.resolve("font").resolve(fileName);
-            Files.createDirectories(glyphPath.getParent());
-            Files.copy(fontPng.toPath(), glyphPath, StandardCopyOption.REPLACE_EXISTING);
+            this.copyFile(fontPng.toPath(), glyphPath);
         }
     }
 
