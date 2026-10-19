@@ -7,8 +7,6 @@ import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import fr.openmc.riftengine.core.resolvers.items.ResolvedItemResource;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -43,7 +41,6 @@ public class ItemsTextureJsonWriter implements PackWriter {
         root.add("texture_data", textureData);
 
         Path outputFile = bedrockRootPath.resolve("textures").resolve("item_texture.json");
-        Files.createDirectories(outputFile.getParent());
-        Files.writeString(outputFile, GSON.toJson(root), StandardCharsets.UTF_8);
+        this.writeJsonFile(outputFile, root);
     }
 }

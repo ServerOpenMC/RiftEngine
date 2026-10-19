@@ -4,8 +4,6 @@ import com.google.gson.JsonObject;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ScoreboardUiWriter implements PackWriter {
@@ -25,8 +23,9 @@ public class ScoreboardUiWriter implements PackWriter {
         visible.addProperty("visible", false);
         root.add("scoreboard_sidebar_score", visible);
 
-        Path outputFile = bedrockRootPath.resolve("ui").resolve("scoreboards.json");
-        Files.createDirectories(outputFile.getParent());
-        Files.writeString(outputFile, GSON.toJson(root), StandardCharsets.UTF_8);
+        Path outputFile = bedrockRootPath
+                .resolve("ui")
+                .resolve("scoreboards.json");
+        this.writeJsonFile(outputFile, root);
     }
 }

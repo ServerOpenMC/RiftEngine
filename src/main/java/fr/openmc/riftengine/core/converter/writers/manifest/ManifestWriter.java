@@ -3,8 +3,6 @@ package fr.openmc.riftengine.core.converter.writers.manifest;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ManifestWriter implements PackWriter {
@@ -38,7 +36,6 @@ public class ManifestWriter implements PackWriter {
             }
             """.formatted(identity.getPackName(), identity.getHeaderUuid(), versionJson, identity.getModuleUuid(), versionJson);
 
-        Files.writeString(bedrockRootPath.resolve("manifest.json"), manifest, StandardCharsets.UTF_8);
-
+        this.writeFile(bedrockRootPath.resolve("manifest.json"), manifest);
     }
 }

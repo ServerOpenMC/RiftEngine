@@ -9,7 +9,6 @@ import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.utils.PathUtils;
 import org.bukkit.Material;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -56,10 +55,10 @@ public class ItemsMappingWriter implements PackWriter {
         root.add("items", itemsSetter);
 
         Path outputFile = PathUtils.getGeyserPath(RiftPlugin.getInstance().getDataPath())
-                .resolve("custom_mappings").resolve("ia-items-injected.json");
+                .resolve("custom_mappings")
+                .resolve("ia-items-injected.json");
         Files.deleteIfExists(outputFile);
-        Files.createDirectories(outputFile.getParent());
-        Files.writeString(outputFile, GSON.toJson(root), StandardCharsets.UTF_8);
+        this.writeJsonFile(outputFile, root);
     }
 
     private JsonObject handleUniqueTexture(ItemEntry item) {

@@ -7,9 +7,7 @@ import fr.openmc.riftengine.core.resolvers.items.ResolvedItemResource;
 import fr.openmc.riftengine.core.utils.IdentifierUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public class ItemsTextureWriter implements PackWriter {
@@ -29,10 +27,8 @@ public class ItemsTextureWriter implements PackWriter {
             for (ResolvedItemResource resource : resources) {
                 if (resource.isVanilla()) continue;
 
-                Path outputFile = bedrockRootPath.resolve(
-                        IdentifierUtils.toBedrockTexturePath(resource.bedrockTexturePath()));
-                Files.createDirectories(outputFile.getParent());
-                Files.copy(resource.sourcePath(), outputFile, StandardCopyOption.REPLACE_EXISTING);
+                Path outputFile = bedrockRootPath.resolve(IdentifierUtils.toBedrockTexturePath(resource.bedrockTexturePath()));
+                this.copyFile(resource.sourcePath(), outputFile);
             }
         }
     }

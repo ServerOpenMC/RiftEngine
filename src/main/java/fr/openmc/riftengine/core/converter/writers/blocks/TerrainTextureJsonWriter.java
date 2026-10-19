@@ -10,8 +10,6 @@ import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import fr.openmc.riftengine.core.resolvers.items.ResolvedItemResource;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -56,8 +54,9 @@ public class TerrainTextureJsonWriter implements PackWriter {
         root.addProperty("num_mip_levels", 4);
         root.add("texture_data", textureData);
 
-        Path outputFile = bedrockRootPath.resolve("textures").resolve("terrain_texture.json");
-        Files.createDirectories(outputFile.getParent());
-        Files.writeString(outputFile, GSON.toJson(root), StandardCharsets.UTF_8);
+        Path outputFile = bedrockRootPath
+                .resolve("textures")
+                .resolve("terrain_texture.json");
+        this.writeJsonFile(outputFile, root);
     }
 }

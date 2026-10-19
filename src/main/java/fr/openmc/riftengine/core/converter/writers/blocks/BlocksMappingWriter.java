@@ -12,7 +12,6 @@ import fr.openmc.riftengine.core.resolvers.items.ResolvedItemResource;
 import fr.openmc.riftengine.core.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.utils.PathUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -63,12 +62,13 @@ public class BlocksMappingWriter implements PackWriter {
         });
         root.add("blocks", blocksSetter);
 
-        Path outputFile = PathUtils.getGeyserPath(RiftPlugin.getInstance().getDataPath())
-                .resolve("custom_mappings").resolve("ia-blocks-injected.json");
+        Path outputFile = PathUtils
+                .getGeyserPath(RiftPlugin.getInstance().getDataPath())
+                .resolve("custom_mappings")
+                .resolve("ia-blocks-injected.json");
 
         Files.deleteIfExists(outputFile);
-        Files.createDirectories(outputFile.getParent());
-        Files.writeString(outputFile, GSON.toJson(root), StandardCharsets.UTF_8);
+        this.writeJsonFile(outputFile, root);
     }
 
     private JsonObject createMaterialInstance(List<ResolvedItemResource> faceResources) {
