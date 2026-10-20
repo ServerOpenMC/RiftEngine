@@ -20,6 +20,8 @@ import fr.openmc.riftengine.core.converter.writers.items.ItemsTextureWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.IconWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
+import fr.openmc.riftengine.core.converter.writers.sounds.SoundsDefinitionsJsonWriter;
+import fr.openmc.riftengine.core.converter.writers.sounds.SoundsFileWriter;
 import fr.openmc.riftengine.core.converter.writers.tooltip.UiCommonTooltipWriter;
 import fr.openmc.riftengine.core.converter.writers.tooltip.glyph.TooltipGlyphApplicatorWriter;
 import fr.openmc.riftengine.core.converter.writers.tooltip.glyph.TooltipGlyphAssignatorWriter;
@@ -52,6 +54,7 @@ public class ConverterManager {
         try {
             PackIdentity identity = PackIdentity.loadOrCreate(plugin);
             List<ItemEntry> items = OMCRegistry.SCANNERS.ITEMS.scan(itemsAdderContents);
+
             ItemResourceResolver itemResolver = RiftRegistry.RESOLVERS.ITEM_RESOURCE_RESOLVER;
             TooltipResourceResolver tooltipResolver = RiftRegistry.RESOLVERS.TOOLTIP_RESOURCE_RESOLVER;
             GuiMcMetaResolver guiResolver = RiftRegistry.RESOLVERS.GUI_MCMETA_RESOLVER;
@@ -64,6 +67,9 @@ public class ConverterManager {
 
             register("Scoreboard",
                     new ScoreboardUiWriter(config.isHideScoreboardNumberBedrock()));
+
+            register("Sounds Definitions Json", new SoundsDefinitionsJsonWriter());
+            register("Sounds File", new SoundsFileWriter());
 
             register("Icônes ItemsAdder", new IconsWriter(itemsAdderContents));
             register("Mappings des symboles", new SymbolWriter());
