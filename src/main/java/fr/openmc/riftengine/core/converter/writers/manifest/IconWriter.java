@@ -18,6 +18,5 @@ public class IconWriter implements PackWriter {
 
             Files.copy(is, bedrockRootPath.resolve(OUTPUT_FILE), StandardCopyOption.REPLACE_EXISTING);
         }
-
     }
 }

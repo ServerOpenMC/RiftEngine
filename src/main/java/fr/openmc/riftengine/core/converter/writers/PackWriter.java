@@ -19,7 +19,11 @@ public interface PackWriter {
     void write(Path bedrockRootPath, Path javaRootPath) throws Exception;
 
     default void writeJsonFile(Path outputFile, JsonObject root) throws IOException {
-        this.writeFile(outputFile, GSON.toJson(root));
+        this.writeJsonFile(outputFile, root, GSON);
+    }
+
+    default void writeJsonFile(Path outputFile, JsonObject root, Gson gson) throws IOException {
+        this.writeFile(outputFile, gson.toJson(root));
     }
 
     default void writeFile(Path outputFile, String content) throws IOException {

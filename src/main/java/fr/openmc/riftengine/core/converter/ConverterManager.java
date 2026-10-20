@@ -20,9 +20,16 @@ import fr.openmc.riftengine.core.converter.writers.items.ItemsTextureWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.IconWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
+import fr.openmc.riftengine.core.converter.writers.tooltip.UiCommonTooltipWriter;
+import fr.openmc.riftengine.core.converter.writers.tooltip.glyph.TooltipGlyphApplicatorWriter;
+import fr.openmc.riftengine.core.converter.writers.tooltip.glyph.TooltipGlyphAssignatorWriter;
+import fr.openmc.riftengine.core.converter.writers.tooltip.textures.TooltipTextureWriter;
 import fr.openmc.riftengine.core.converter.writers.translations.TranslationInjector;
 import fr.openmc.riftengine.core.converter.writers.ui.ScoreboardUiWriter;
 import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
+import fr.openmc.riftengine.core.resolvers.mcmeta.animation.AnimationMcMetaResolver;
+import fr.openmc.riftengine.core.resolvers.mcmeta.gui.GuiMcMetaResolver;
+import fr.openmc.riftengine.core.resolvers.tooltip.TooltipResourceResolver;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -45,7 +52,10 @@ public class ConverterManager {
         try {
             PackIdentity identity = PackIdentity.loadOrCreate(plugin);
             List<ItemEntry> items = OMCRegistry.SCANNERS.ITEMS.scan(itemsAdderContents);
-            ItemResourceResolver resolver = RiftRegistry.RESOLVERS.ITEM_RESOURCE_RESOLVER;
+            ItemResourceResolver itemResolver = RiftRegistry.RESOLVERS.ITEM_RESOURCE_RESOLVER;
+            TooltipResourceResolver tooltipResolver = RiftRegistry.RESOLVERS.TOOLTIP_RESOURCE_RESOLVER;
+            GuiMcMetaResolver guiResolver = RiftRegistry.RESOLVERS.GUI_MCMETA_RESOLVER;
+            AnimationMcMetaResolver animResolver = RiftRegistry.RESOLVERS.ANIMATION_MCMETA_RESOLVER;
 
             register("Icônes", new IconWriter());
             register("Manifest", new ManifestWriter(identity));
@@ -58,13 +68,21 @@ public class ConverterManager {
             register("Icônes ItemsAdder", new IconsWriter(itemsAdderContents));
             register("Mappings des symboles", new SymbolWriter());
 
-            register("Textures des items", new ItemsTextureJsonWriter(items, resolver));
-            register("Fichiers de textures", new ItemsTextureWriter(items, resolver));
-            register("Mappings des items", new ItemsMappingWriter(items, resolver));
+            register("Textures des items", new ItemsTextureJsonWriter(items, itemResolver));
+            register("Fichiers de textures", new ItemsTextureWriter(items, itemResolver));
+            register("Mappings des items", new ItemsMappingWriter(items, itemResolver));
+
+            register("Textures des tooltips", new TooltipTextureWriter(items, guiResolver, tooltipResolver));
+            register("Assignations des glyphs pour les tooltips",
+                    new TooltipGlyphAssignatorWriter(items, tooltipResolver));
+            register("Application des glyphs sur les items",
+                    new TooltipGlyphApplicatorWriter(items, itemsAdderContents));
+            register("Génération du JSON UI pour les tooltips",
+                    new UiCommonTooltipWriter(items, tooltipResolver, guiResolver, animResolver));
 
             register("Textures des blocs",
-                    new TerrainTextureJsonWriter(identity, items, resolver));
-            register("Mappings des blocs", new BlocksMappingWriter(items, resolver));
+                    new TerrainTextureJsonWriter(identity, items, itemResolver));
+            register("Mappings des blocs", new BlocksMappingWriter(items, itemResolver));
 
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors d'initialisation du ConverterManager", e);
@@ -108,9 +126,13 @@ public class ConverterManager {
         File pluginsDir = plugin.getDataFolder().getParentFile(); // * root/plugins/
         File itemsAdderDir = new File(pluginsDir, "ItemsAdder"); // * root/plugins/ItemsAdder
         File outputDir = new File(itemsAdderDir, "output"); // * root/plugins/ItemsAdder/output
-        File generatedDir = new File(outputDir, "generated.zip"); // * root/plugins/ItemsAdder/output/generated.zip
+        File clientPacksDir = new File(outputDir, "client_packs"); // * root/plugins/ItemsAdder/output/client_packs/
 
-        return generatedDir.toPath();
+        return FilesUtils.listFileNames(clientPacksDir.toPath().toAbsolutePath().toString()).stream()
+                .filter(name -> name.contains(".zip") && name.contains("26_3") && name.contains("fast_compression"))
+                .findFirst()
+                .map(name -> clientPacksDir.toPath().resolve(name))
+                .orElse(null);
     }
 
     public static Path getItemsAdderContents(JavaPlugin plugin) {

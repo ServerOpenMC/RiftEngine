@@ -2,13 +2,11 @@ package fr.openmc.riftengine.core.converter.writers.glyph.icons;
 
 import fr.openmc.core.utils.YmlUtils;
 import fr.openmc.riftengine.core.RiftLog;
-import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.listeners.LoadAfterItemsAdderListener;
 import fr.openmc.riftengine.core.registry.glyphs.Glyph;
 import fr.openmc.riftengine.core.registry.glyphs.types.IconGlyph;
-import org.bukkit.Bukkit;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -67,12 +65,6 @@ public class SymbolWriter implements PackWriter {
             }
         }
 
-        LoadAfterItemsAdderListener.actionToLaunch.add(this::reloadItemsAdder);
-    }
-
-    private void reloadItemsAdder() {
-        Bukkit.getScheduler().runTask(RiftPlugin.getInstance(), () ->
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iazip")
-        );
+        LoadAfterItemsAdderListener.reloadToLaunch = true;
     }
 }
