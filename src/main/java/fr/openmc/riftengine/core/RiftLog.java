@@ -18,7 +18,13 @@ public enum RiftLog {
     NUMBER_GLYPH_REGISTERED("{}/{} glyphs enregistré", LogType.INFO),
 
     ITEM_NOT_RESOURCE("Item {} : n'a pas de best resources", LogType.WARN),
-    RESOURCE_NOT_FOUND("Item {} : a aucune resource", LogType.WARN)
+    RESOURCE_NOT_FOUND("Item {} : a aucune resource", LogType.WARN),
+    NUMBER_TOOLTIP_REGISTERED("{}/{} tooltip enregistré", LogType.INFO),
+    GLYPH_NOT_FOUND("Glyph {} introuvable", LogType.WARN),
+    FLIPBOOK_NULL("Flipbook est null pour ce tooltip {}", LogType.WARN),
+    NULL("{} est null", LogType.WARN),
+
+    PATH_CANT_REDUCED_TO_TEXTURES("resource {} ne peut pas etre réduite à un chemin de texture", LogType.WARN),
     ;
 
     public static void logBanner(String pluginVersion, String server, String javaVersion) {

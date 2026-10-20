@@ -53,7 +53,7 @@ public class ItemResourceResolver extends AbstractResolver<ItemEntry, List<Resol
 
                 Path reducedPath = PathUtils.getPathFromRoot(resourcePath, "textures");
                 if (reducedPath != null) {
-                    bedrockTextureValue = IdentifierUtils.toBedrockTexturePath(reducedPath.toString())
+                    bedrockTextureValue = IdentifierUtils.toBedrockTexturePath(reducedPath.toString()).toString()
                             .replaceFirst("\\.[^/.]+$", "");
                 }
             }

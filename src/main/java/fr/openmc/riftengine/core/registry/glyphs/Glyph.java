@@ -19,6 +19,11 @@ public abstract class Glyph {
         this.bedrockChar = buildBedrockChar();
     }
 
+    public String getBedrockCharString() {
+        return String.format("\\u%04X",
+                (int) this.getBedrockChar());
+    }
+
     private char buildBedrockChar() {
         int page = Integer.parseInt(this.page, 16);
         return (char) ((page << 8) | (row * 16 + col));
