@@ -7,6 +7,8 @@ import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
+import fr.openmc.riftengine.core.converter.writers.glyph.chestgui.ChestScreenWriter;
+import fr.openmc.riftengine.core.converter.writers.glyph.chestgui.ResolvedChestGui;
 import fr.openmc.riftengine.core.registry.glyphs.GlyphsRegistry;
 import fr.openmc.riftengine.core.registry.glyphs.types.IconGlyph;
 
@@ -77,7 +79,7 @@ public class IconsWriter implements PackWriter {
             }
 
             if (type.equals(IconsType.MENU_GUI)) {
-                RiftLog.DETECTED_AS_MENU_GUI.send(entry.namespacedId());
+                ChestScreenWriter.chestGuis.add(new ResolvedChestGui(entry, image.getWidth(), image.getHeight()));
                 continue;
             }
 

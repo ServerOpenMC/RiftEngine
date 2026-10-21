@@ -16,3 +16,6 @@ dependencies:
     Geyser-Spigot:
       load: BEFORE
       required: true
+    floodgate:
+      load: BEFORE
+      required: true

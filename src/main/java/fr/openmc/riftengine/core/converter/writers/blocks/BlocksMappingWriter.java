@@ -5,11 +5,11 @@ import fr.openmc.riftengine.api.scanner.blocks.BlockStateScanner;
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.api.scanner.items.entry.behaviours.IABehaviour;
 import fr.openmc.riftengine.api.scanner.items.entry.behaviours.block.BlocksBehaviour;
+import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.RiftPlugin;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import fr.openmc.riftengine.core.resolvers.items.ResolvedItemResource;
-import fr.openmc.riftengine.core.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.utils.PathUtils;
 
 import java.nio.file.Files;

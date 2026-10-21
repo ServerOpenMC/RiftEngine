@@ -4,10 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.registry.glyphs.types.FontGlyph;
-import fr.openmc.riftengine.core.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.utils.ScanUtils;
 
 import java.io.File;
