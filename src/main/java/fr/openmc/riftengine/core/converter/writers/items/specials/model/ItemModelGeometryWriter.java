@@ -5,7 +5,10 @@ import fr.openmc.core.utils.JsonUtils;
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.api.scanner.items.entry.ItemModel;
 import fr.openmc.riftengine.api.utils.IdentifierUtils;
+import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.model.converter.JavaModelToGeometryConverter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.model.converter.ModelTextureAtlas;
 
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -37,11 +40,19 @@ public class ItemModelGeometryWriter implements PackWriter {
 
             if (rootModelJson == null) continue;
 
+            ModelTextureAtlas atlas = ModelTextureAtlas.build(javaRootPath, rootModelJson, model.namespace());
+
             JsonObject rootModelGeoJson = JavaModelToGeometryConverter.convert(
                     rootModelJson,
                     model.toBedrockGeometryId(),
-                    true
+                    true,
+                    atlas
             );
+
+            if (rootModelGeoJson == null) {
+                RiftLog.MODEL_PARENT.send(item.namespacedId());
+                continue;
+            }
 
             Path output = bedrockRootPath.resolve(model.toBedrockModelPath());
             this.writeJsonFile(output, rootModelGeoJson);

@@ -1,4 +1,4 @@
-package fr.openmc.riftengine.core.converter.writers.items.specials.model;
+package fr.openmc.riftengine.core.converter.writers.items.specials.model.converter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,9 +6,7 @@ import com.google.gson.JsonObject;
 
 /**
  * Convertit un modèle Java Edition (JSON Blockbench) en géométrie Bedrock (.geo.json).
- * Classe pure : ne touche à aucun fichier, renvoie un JsonObject.
  *
- * Limites : un seul bone (groupes aplatis), une seule texture (UV mis à l'échelle via "texture_size").
  * Classe généré par IA, je précise. Assez complexe de définir les formules et de les appliquer sans
  * s'aider d'une IA
  */
@@ -25,15 +23,32 @@ public final class JavaModelToGeometryConverter {
      * @return le contenu du .geo.json, ou null si aucun élément exploitable
      */
     public static JsonObject convert(JsonObject javaModel, String geometryId, boolean itemBinding) {
+        return convert(javaModel, geometryId, itemBinding, null);
+    }
+
+    /**
+     * @param javaModel le JSON du modèle Java
+     * @param geometryId ex. "geometry.omc_dream.orb.orb_cloud"
+     * @param itemBinding true pour ajouter le binding d'item tenu en main (attachable)
+     * @param atlas l'atlas de textures (donc le regroupement des textures)
+     * @return le contenu du .geo.json, ou null si aucun élément exploitable
+     */
+    public static JsonObject convert(JsonObject javaModel, String geometryId, boolean itemBinding,
+                                     ModelTextureAtlas atlas) {
         if (!javaModel.has("elements") || !javaModel.get("elements").isJsonArray()) return null;
 
-        int texW = 16, texH = 16;
+        int texW = 16;
+        int texH = 16;
         if (javaModel.has("texture_size") && javaModel.get("texture_size").isJsonArray()) {
             JsonArray ts = javaModel.getAsJsonArray("texture_size");
             if (ts.size() >= 2) {
                 texW = ts.get(0).getAsInt();
                 texH = ts.get(1).getAsInt();
             }
+        }
+        if (atlas != null) {
+            texW = atlas.width();
+            texH = atlas.height();
         }
         double scaleU = texW / 16.0;
         double scaleV = texH / 16.0;
@@ -43,7 +58,7 @@ public final class JavaModelToGeometryConverter {
             if (!el.isJsonObject()) continue;
             JsonObject element = el.getAsJsonObject();
             if (!element.has("from") || !element.has("to")) continue;
-            cubes.add(convertElement(element, scaleU, scaleV));
+            cubes.add(convertElement(element, scaleU, scaleV, atlas));
         }
         if (cubes.isEmpty()) return null;
 
@@ -109,7 +124,7 @@ public final class JavaModelToGeometryConverter {
         return new double[]{-((minX + maxX) / 2.0), (minY + maxY) / 2.0, (minZ + maxZ) / 2.0};
     }
 
-    private static JsonObject convertElement(JsonObject element, double scaleU, double scaleV) {
+    private static JsonObject convertElement(JsonObject element, double scaleU, double scaleV, ModelTextureAtlas atlas) {
         JsonArray from = element.getAsJsonArray("from");
         JsonArray to = element.getAsJsonArray("to");
 
@@ -207,7 +222,16 @@ public final class JavaModelToGeometryConverter {
                 }
 
                 boolean flip = faceName.equals("up") || faceName.equals("down");
-                bedrockUV.add(faceName, convertFaceUV(uv, flip, scaleU, scaleV, faceRotation));
+                double sU = scaleU, sV = scaleV, offU = 0, offV = 0;
+                if (atlas != null) {
+                    String ref = javaFace.has("texture") ? javaFace.get("texture").getAsString() : "#0";
+                    ModelTextureAtlas.Sprite s = atlas.sprite(ref);
+                    if (s != null) {
+                        sU = s.width() / 16.0;  sV = s.height() / 16.0;
+                        offU = s.x();           offV = s.y();
+                    }
+                }
+                bedrockUV.add(faceName, convertFaceUV(uv, flip, sU, sV, offU, offV, faceRotation));
             }
             if (bedrockUV.size() > 0) cube.add("uv", bedrockUV);
         }
@@ -226,9 +250,12 @@ public final class JavaModelToGeometryConverter {
         };
     }
 
-    private static JsonObject convertFaceUV(double[] uv, boolean flipUpDown, double scaleU, double scaleV, int rotation) {
-        double u1 = uv[0] * scaleU, v1 = uv[1] * scaleV;
-        double u2 = uv[2] * scaleU, v2 = uv[3] * scaleV;
+    private static JsonObject convertFaceUV(double[] uv, boolean flipUpDown, double scaleU, double scaleV,
+                                            double offU, double offV, int rotation) {
+        double u1 = uv[0] * scaleU + offU;
+        double v1 = uv[1] * scaleV + offV;
+        double u2 = uv[2] * scaleU + offU;
+        double v2 = uv[3] * scaleV + offV;
 
         JsonArray uvArr = new JsonArray();
         JsonArray sizeArr = new JsonArray();

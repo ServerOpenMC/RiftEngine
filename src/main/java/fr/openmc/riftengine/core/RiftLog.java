@@ -25,6 +25,8 @@ public enum RiftLog {
     NULL("{} est null", LogType.WARN),
     ENTRY_EQUIPMENT_NULL("{} est null, item qui se fait passer pour une piece d'armure mais que la texture/model est géré autrement ", LogType.WARN),
 
+    MODEL_PARENT("le model ({}) convertit est null, le model hérite surement de parent et doit etre géré autrement", LogType.WARN),
+
     PATH_CANT_REDUCED_TO_TEXTURES("resource {} ne peut pas etre réduite à un chemin de texture", LogType.WARN),
     ;
 

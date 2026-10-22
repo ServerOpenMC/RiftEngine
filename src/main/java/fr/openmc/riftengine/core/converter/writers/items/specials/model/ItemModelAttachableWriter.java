@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import fr.openmc.core.utils.JsonUtils;
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.api.scanner.items.entry.ItemModel;
-import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import fr.openmc.riftengine.core.resolvers.items.ResolvedItemResource;
@@ -67,9 +66,10 @@ public class ItemModelAttachableWriter implements PackWriter {
             if (textures.isEmpty()) continue;
 
             JsonObject root = JsonUtils.parseJson(TEMPLATE_ATTACHABLE
-                    .replace("<identifier>", "geyser_custom:" + bedrockIdentifier)
-                    .replace("<texture>", "textures/" + IdentifierUtils.removeExtensionPath(textures.getFirst()))
-                    .replace("<geometry>", model.toBedrockGeometryId()));
+                            .replace("<identifier>", "geyser_custom:" + bedrockIdentifier)
+                            .replace("<texture>", model.toBedrockAtlasPath())
+                            .replace("<geometry>", model.toBedrockGeometryId()));
+
 
             Path outputFile = bedrockRootPath
                     .resolve("attachables")

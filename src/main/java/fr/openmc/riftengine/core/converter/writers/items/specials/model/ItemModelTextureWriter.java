@@ -1,10 +1,15 @@
 package fr.openmc.riftengine.core.converter.writers.items.specials.model;
 
+import com.google.gson.JsonObject;
+import fr.openmc.core.utils.JsonUtils;
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
 import fr.openmc.riftengine.api.scanner.items.entry.ItemModel;
 import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.model.converter.ModelTextureAtlas;
 
+import javax.imageio.ImageIO;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
@@ -32,11 +37,17 @@ public class ItemModelTextureWriter implements PackWriter {
             if (modelCreated.contains(modelName)) continue;
             modelCreated.add(modelName);
 
-            for (String textureName : model.texturesPath(javaRootPath)) {
-                Path javaTexturePath = IdentifierUtils.resolveTextureId(javaRootPath, item.getNamespace(), textureName);
-                this.copyFile(javaTexturePath,
-                        bedrockRootPath.resolve("textures/" + IdentifierUtils.toBedrockTexturePath(textureName)));
-            }
+            JsonObject rootModelJson = JsonUtils.loadJson(IdentifierUtils.resolveModelId(javaRootPath, modelName));
+            if (rootModelJson == null) continue;
+
+            ModelTextureAtlas atlas = ModelTextureAtlas.build(javaRootPath, rootModelJson, model.namespace());
+            System.out.println("atlas de " + item.namespacedId() + " " + atlas);
+            if (atlas == null) continue;
+
+            Path output = bedrockRootPath.resolve(model.toBedrockAtlasPath() + ".png");
+            Files.createDirectories(output.getParent());
+            ImageIO.write(atlas.getImage(), "png", output.toFile());
+
         }
     }
 }
