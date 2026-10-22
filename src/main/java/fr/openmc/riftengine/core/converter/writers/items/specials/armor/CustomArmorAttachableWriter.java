@@ -60,9 +60,7 @@ public class CustomArmorAttachableWriter implements PackWriter {
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws IOException {
         for (ItemEntry item : items) {
-            System.out.println("1");
             if (!item.getBehaviour().isArmor()) continue;
-            System.out.println("2");
             if (!(item.getBehaviour() instanceof ArmorsBehaviour(
                     EquipementEntry entry,
                     ArmorType type
@@ -81,9 +79,7 @@ public class CustomArmorAttachableWriter implements PackWriter {
                 bedrockIdentifier = resolvedItems.getFirst().bedrockIdentifier();
             }
 
-            System.out.println("3 " + bedrockIdentifier + " " + resolvedItems);
             if (bedrockIdentifier == null) continue;
-            System.out.println("4");
 
             JsonObject root = JsonUtils.parseJson(TEMPLATE_ATTACHABLE
                     .replace("<identifier>", "geyser_custom:" + bedrockIdentifier)
