@@ -19,6 +19,9 @@ import fr.openmc.riftengine.core.converter.writers.items.ItemsTextureJsonWriter;
 import fr.openmc.riftengine.core.converter.writers.items.ItemsTextureWriter;
 import fr.openmc.riftengine.core.converter.writers.items.specials.armor.CustomArmorAttachableWriter;
 import fr.openmc.riftengine.core.converter.writers.items.specials.armor.CustomArmorTextureWriter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.model.ItemModelAttachableWriter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.model.ItemModelGeometryWriter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.model.ItemModelTextureWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.IconWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
@@ -82,6 +85,10 @@ public class ConverterManager {
 
             register("Textures des armures", new CustomArmorTextureWriter(items));
             register("Génération des attachables pour les armures", new CustomArmorAttachableWriter(items, itemResolver));
+
+            register("Textures des items 3d", new ItemModelTextureWriter(items));
+            register("Génération des fichiers de géometrie", new ItemModelGeometryWriter(items));
+            register("Générations des attachables pour les items 3D", new ItemModelAttachableWriter(items, itemResolver));
 
             register("Textures des tooltips", new TooltipTextureWriter(items, guiResolver, tooltipResolver));
             register("Assignations des glyphs pour les tooltips",

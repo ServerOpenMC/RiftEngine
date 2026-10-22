@@ -32,6 +32,13 @@ public class ItemsTextureJsonWriter implements PackWriter {
         for (ItemEntry itemEntry : items) {
             List<ResolvedItemResource> resolvedItemResources = resolver.resolve(javaRootPath, itemEntry);
 
+            if (resolvedItemResources.isEmpty()) {
+                JsonObject itemData = new JsonObject();
+                itemData.addProperty("textures", "textures/misc/missing_texture");
+                textureData.add(resolver.resolveBedrockIdentifier(itemEntry), itemData);
+                continue;
+            }
+
             for (ResolvedItemResource resource : resolvedItemResources) {
                 JsonObject itemData = new JsonObject();
                 itemData.addProperty("textures", resource.bedrockTexturePath());
