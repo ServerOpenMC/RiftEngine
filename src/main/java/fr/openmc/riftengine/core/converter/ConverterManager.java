@@ -17,6 +17,8 @@ import fr.openmc.riftengine.core.converter.writers.glyph.icons.SymbolWriter;
 import fr.openmc.riftengine.core.converter.writers.items.ItemsMappingWriter;
 import fr.openmc.riftengine.core.converter.writers.items.ItemsTextureJsonWriter;
 import fr.openmc.riftengine.core.converter.writers.items.ItemsTextureWriter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.armor.CustomArmorAttachableWriter;
+import fr.openmc.riftengine.core.converter.writers.items.specials.armor.CustomArmorTextureWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.IconWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.ManifestWriter;
 import fr.openmc.riftengine.core.converter.writers.manifest.PackIdentity;
@@ -78,6 +80,9 @@ public class ConverterManager {
             register("Fichiers de textures", new ItemsTextureWriter(items, itemResolver));
             register("Mappings des items", new ItemsMappingWriter(items, itemResolver));
 
+            register("Textures des armures", new CustomArmorTextureWriter(items));
+            register("Génération des attachables pour les armures", new CustomArmorAttachableWriter(items, itemResolver));
+
             register("Textures des tooltips", new TooltipTextureWriter(items, guiResolver, tooltipResolver));
             register("Assignations des glyphs pour les tooltips",
                     new TooltipGlyphAssignatorWriter(items, tooltipResolver));
@@ -105,13 +110,12 @@ public class ConverterManager {
     public Path generateConvertedPack() throws Exception {
         Path javaPackPath = getJavaPackPath(RiftPlugin.getInstance());
 
-        Path outputDir = plugin.getDataFolder().toPath().resolve("output");
+        Path outputDir = plugin.getOutputDir();
         FilesUtils.deleteDirectory(outputDir.toFile());
         Files.createDirectories(outputDir);
 
-        Path workDir = outputDir.resolve("internal");
-        Path javaExtractDir = workDir.resolve("java");
-        Path bedrockBuildDir = workDir.resolve("bedrock");
+        Path javaExtractDir = outputDir.resolve("java");
+        Path bedrockBuildDir = outputDir.resolve("bedrock");
         Files.createDirectories(bedrockBuildDir);
 
         ZipUtils.unzip(javaPackPath, javaExtractDir);

@@ -63,6 +63,7 @@ public class ItemsMappingWriter implements PackWriter {
                 .resolve(OUTPUT_FILE);
         Files.deleteIfExists(outputFile);
         this.writeJsonFile(outputFile, root);
+        this.writeJsonFile(RiftPlugin.getInstance().getOutputDir().resolve(OUTPUT_FILE), root);
     }
 
     private JsonObject handleUniqueTexture(ItemEntry item, ResolvedItemResource resource) {

@@ -86,6 +86,10 @@ public class RiftPlugin extends JavaPlugin implements EventRegistrar {
         RiftLog.RIFT_DISABLE.send();
     }
 
+    public Path getOutputDir() {
+        return this.getDataFolder().toPath().resolve("output");
+    }
+
     public void updateBedrockResourcePack() {
         try {
             Path generatedBedrockPack = converterManager.generateConvertedPack();
