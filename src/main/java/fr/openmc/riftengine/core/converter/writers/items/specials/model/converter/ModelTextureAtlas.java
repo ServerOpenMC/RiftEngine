@@ -21,13 +21,14 @@ import java.util.Map;
  * Adapte les textures d'un modèle car bedrock ne supporte pas les plusieures textures par modeles :/
  *
  * Classe généré par IA :{
- * todo: la refaire à ma sauce
+ * todo: la refaire à ma sauce, un ImageUtils car le probleme pour faire un atlas je l'avais aussi dans FrameTextureConverter
  */
-public class ModelTextureAtlas {
+@Getter
+public final class ModelTextureAtlas {
 
-    public record Sprite(int x, int y, int width, int height) {}
+    public record Sprite(int x, int y, int width, int height) {
+    }
 
-    @Getter
     private final BufferedImage image;
     private final Map<String, Sprite> spritesByKey;
 
@@ -50,8 +51,9 @@ public class ModelTextureAtlas {
     }
 
     public static ModelTextureAtlas build(Path javaRootPath, JsonObject model, String defaultNamespace) throws IOException {
-        if (!model.has("textures") || !model.get("textures").isJsonObject()) return null;
-        JsonObject textures = model.getAsJsonObject("textures");
+        JsonObject textures = JsonUtils.getJsonObject(model, "textures", null);
+
+        if (textures == null) return null;
 
         Map<String, String> keyToTexture = new LinkedHashMap<>();
         for (String key : textures.keySet()) {
@@ -105,17 +107,13 @@ public class ModelTextureAtlas {
     }
 
     private static BufferedImage loadFirstFrame(Path javaRootPath, String textureId) throws IOException {
-        System.out.println("texture " + textureId + " et " + javaRootPath);
         Path png = IdentifierUtils.resolveTextureId(javaRootPath, textureId);
-        System.out.println("texture de " + textureId + " png " + png);
         if (!Files.exists(png)) return null;
 
         BufferedImage img = ImageIO.read(png.toFile());
-        System.out.println("texture de " + textureId + "  img  " + img );
         if (img == null) return null;
 
         Path meta = IdentifierUtils.resolveMetaId(javaRootPath, textureId, ".png");
-        System.out.println("texture de " + textureId + " meta " + meta );
         if (!Files.exists(meta)) return img;
 
         JsonObject metaJson;
@@ -126,8 +124,7 @@ public class ModelTextureAtlas {
         }
         if (metaJson == null || !metaJson.has("animation")) return img;
 
-        JsonObject animation = metaJson.get("animation").isJsonObject()
-                ? metaJson.getAsJsonObject("animation") : new JsonObject();
+        JsonObject animation = JsonUtils.getJsonObject(metaJson, "animation", new JsonObject());
         int frameWidth = JsonUtils.getInt(animation, "width", img.getWidth());
         int frameHeight = JsonUtils.getInt(animation, "height", frameWidth);
 

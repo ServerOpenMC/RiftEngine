@@ -20,14 +20,14 @@ public class ItemModelAttachableWriter implements PackWriter {
         this.resolver = resolver;
     }
 
-    private static final String TEMPLATE_ATTACHABLE = """
+    private final String TEMPLATE_ATTACHABLE = """
             {
                 "format_version": "1.21.50",
                 "minecraft:attachable": {
                     "description": {
                         "identifier": "<identifier>",
                         "materials": {
-                            "default": "entity_alphatest",
+                            "default": "<material>",
                             "enchanted": "entity_alphatest_glint"
                         },
                         "textures": {
@@ -37,11 +37,36 @@ public class ItemModelAttachableWriter implements PackWriter {
                         "geometry": {
                             "default": "<geometry>"
                         },
+                        "scripts": {
+                            "pre_animation": [
+                                "v.main_hand = c.item_slot == 'main_hand';",
+                                "v.off_hand = c.item_slot == 'off_hand';",
+                                "v.head = c.item_slot == 'head';"
+                            ],
+                            "animate": [
+                                {"thirdperson_main_hand": "v.main_hand && !c.is_first_person"},
+                                {"thirdperson_off_hand": "v.off_hand && !c.is_first_person"},
+                                {"thirdperson_head": "v.head && !c.is_first_person"},
+                                {"firstperson_main_hand": "v.main_hand && c.is_first_person"},
+                                {"firstperson_off_hand": "v.off_hand && c.is_first_person"},
+                                {"firstperson_head": "c.is_first_person && v.head"}
+                            ]
+                        },
+                        "animations": {
+                            "thirdperson_main_hand": "<animation>.thirdperson_main_hand",
+                            "thirdperson_off_hand": "<animation>.thirdperson_off_hand",
+                            "thirdperson_head": "<animation>.head",
+                            "firstperson_main_hand": "<animation>.firstperson_main_hand",
+                            "firstperson_off_hand": "<animation>.firstperson_off_hand",
+                            "firstperson_head": "<animation>.disable"
+                        },
                         "render_controllers": ["controller.render.item_default"]
                     }
                 }
             }
             """;
+
+
 
     @Override
     public void write(Path bedrockRootPath, Path javaRootPath) throws Exception {
@@ -57,6 +82,8 @@ public class ItemModelAttachableWriter implements PackWriter {
                 bedrockIdentifier = resolvedItems.getFirst().bedrockIdentifier();
             }
 
+            if (bedrockIdentifier == null) continue;
+
             ItemModel model = item.getModel();
 
             List<String> textures = model.texturesPath(javaRootPath);
@@ -66,10 +93,12 @@ public class ItemModelAttachableWriter implements PackWriter {
             if (textures.isEmpty()) continue;
 
             JsonObject root = JsonUtils.parseJson(TEMPLATE_ATTACHABLE
-                            .replace("<identifier>", "geyser_custom:" + bedrockIdentifier)
-                            .replace("<texture>", model.toBedrockAtlasPath())
-                            .replace("<geometry>", model.toBedrockGeometryId()));
-
+                    .replace("<identifier>", "geyser_custom:" + bedrockIdentifier)
+                    .replace("<material>", "entity_alphablend")
+                    .replace("<texture>", model.toBedrockAtlasPath())
+                    .replace("<geometry>", model.toBedrockGeometryId())
+                    .replace("<animation>", model.toBedrockAnimationId())
+            );
 
             Path outputFile = bedrockRootPath
                     .resolve("attachables")

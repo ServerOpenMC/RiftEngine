@@ -20,16 +20,6 @@ public final class JavaModelToGeometryConverter {
      * @param javaModel le JSON du modèle Java
      * @param geometryId ex. "geometry.omc_dream.orb.orb_cloud"
      * @param itemBinding true pour ajouter le binding d'item tenu en main (attachable)
-     * @return le contenu du .geo.json, ou null si aucun élément exploitable
-     */
-    public static JsonObject convert(JsonObject javaModel, String geometryId, boolean itemBinding) {
-        return convert(javaModel, geometryId, itemBinding, null);
-    }
-
-    /**
-     * @param javaModel le JSON du modèle Java
-     * @param geometryId ex. "geometry.omc_dream.orb.orb_cloud"
-     * @param itemBinding true pour ajouter le binding d'item tenu en main (attachable)
      * @param atlas l'atlas de textures (donc le regroupement des textures)
      * @return le contenu du .geo.json, ou null si aucun élément exploitable
      */
@@ -62,17 +52,11 @@ public final class JavaModelToGeometryConverter {
         }
         if (cubes.isEmpty()) return null;
 
-        JsonObject bone = new JsonObject();
-        bone.addProperty("name", "bone");
-        if (itemBinding)
-            bone.addProperty("binding", "q.item_slot_to_bone_name(context.item_slot)");
-        double[] pivot = bonePivot(javaModel);
-        if (pivot[0] != 0 || pivot[1] != 0 || pivot[2] != 0)
-            bone.add("pivot", toArray(pivot[0], pivot[1], pivot[2]));
-        bone.add("cubes", cubes);
-
         JsonArray bones = new JsonArray();
-        bones.add(bone);
+        bones.add(bone(ROOT_BONE, null, itemBinding, null));
+        bones.add(bone(ROOT_BONE + "_x", ROOT_BONE, false, null));
+        bones.add(bone(ROOT_BONE + "_y", ROOT_BONE + "_x", false, null));
+        bones.add(bone(ROOT_BONE + "_z", ROOT_BONE + "_y", false, cubes));
 
         JsonObject description = new JsonObject();
         description.addProperty("identifier", geometryId);
@@ -93,35 +77,6 @@ public final class JavaModelToGeometryConverter {
         root.addProperty("format_version", "1.21.0");
         root.add("minecraft:geometry", geoArray);
         return root;
-    }
-
-    private static double[] bonePivot(JsonObject javaModel) {
-        double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE, minZ = Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
-        boolean found = false;
-        for (JsonElement el : javaModel.getAsJsonArray("elements")) {
-            if (!el.isJsonObject()) continue;
-            JsonObject e = el.getAsJsonObject();
-            if (!e.has("from") || !e.has("to")) continue;
-            JsonArray f = e.getAsJsonArray("from"), t = e.getAsJsonArray("to");
-            double fx = f.get(0).getAsDouble() - CENTRE_X;
-            double fy = f.get(1).getAsDouble() - CENTRE_Y;
-            double fz = f.get(2).getAsDouble() - CENTRE_Z;
-
-            double tx = t.get(0).getAsDouble() - CENTRE_X;
-            double ty = t.get(1).getAsDouble() - CENTRE_Y;
-            double tz = t.get(2).getAsDouble() - CENTRE_Z;
-
-            minX = Math.min(minX, Math.min(fx, tx));
-            minY = Math.min(minY, Math.min(fy, ty));
-            minZ = Math.min(minZ, Math.min(fz, tz));
-            maxX = Math.max(maxX, Math.max(fx, tx));
-            maxY = Math.max(maxY, Math.max(fy, ty));
-            maxZ = Math.max(maxZ, Math.max(fz, tz));
-            found = true;
-        }
-        if (!found) return new double[]{0, 0, 0};
-        return new double[]{-((minX + maxX) / 2.0), (minY + maxY) / 2.0, (minZ + maxZ) / 2.0};
     }
 
     private static JsonObject convertElement(JsonObject element, double scaleU, double scaleV, ModelTextureAtlas atlas) {
@@ -150,6 +105,11 @@ public final class JavaModelToGeometryConverter {
         double sizeZ = Math.max(fromZ, toZ) - originZ;
 
         originX = -(originX + sizeX);
+        int invertedAxes = (rawFromX > rawToX ? 1 : 0) + (rawFromY > rawToY ? 1 : 0) + (rawFromZ > rawToZ ? 1 : 0);
+        if (invertedAxes % 2 == 1) {
+            originX += sizeX;  originY += sizeY;  originZ += sizeZ;
+            sizeX = -sizeX;    sizeY = -sizeY;    sizeZ = -sizeZ;
+        }
 
         JsonObject cube = new JsonObject();
         cube.add("origin", toArray(originX, originY, originZ));
@@ -170,7 +130,7 @@ public final class JavaModelToGeometryConverter {
                     }
                     case "y" -> {
                         rotation.add(0);
-                        rotation.add(angle);
+                        rotation.add(-angle);
                         rotation.add(0);
                     }
                     case "z" -> {
@@ -284,6 +244,18 @@ public final class JavaModelToGeometryConverter {
         arr.add(round4(y));
         arr.add(round4(z));
         return arr;
+    }
+
+    public static final String ROOT_BONE = "bone";
+
+    private static JsonObject bone(String name, String parent, boolean binding, JsonArray cubes) {
+        JsonObject b = new JsonObject();
+        b.addProperty("name", name);
+        if (parent != null) b.addProperty("parent", parent);
+        if (binding) b.addProperty("binding", "c.item_slot == 'head' ? 'head' : q.item_slot_to_bone_name(c.item_slot)");
+        b.add("pivot", toArray(0, 8, 0));
+        if (cubes != null) b.add("cubes", cubes);
+        return b;
     }
 
     private static double round4(double v) {
