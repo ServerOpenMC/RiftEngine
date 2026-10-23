@@ -1,10 +1,10 @@
 package fr.openmc.riftengine.core.converter.writers.items;
 
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
+import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import fr.openmc.riftengine.core.resolvers.items.ResolvedItemResource;
-import fr.openmc.riftengine.core.utils.IdentifierUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;

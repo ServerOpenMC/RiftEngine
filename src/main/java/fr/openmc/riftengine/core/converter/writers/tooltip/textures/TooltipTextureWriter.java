@@ -1,13 +1,13 @@
 package fr.openmc.riftengine.core.converter.writers.tooltip.textures;
 
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
+import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.resolvers.mcmeta.gui.GuiMcMetaResolver;
 import fr.openmc.riftengine.core.resolvers.mcmeta.gui.ResolvedGuiMcMeta;
 import fr.openmc.riftengine.core.resolvers.tooltip.ResolvedTooltipResource;
 import fr.openmc.riftengine.core.resolvers.tooltip.TooltipResourceResolver;
-import fr.openmc.riftengine.core.utils.IdentifierUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -75,7 +75,7 @@ public class TooltipTextureWriter implements PackWriter {
         FrameTextureConverter.convert(
                 resolvedGuiMcMeta,
                 imagePath,
-                bedrockRootPath.resolve( IdentifierUtils.toBedrockTexturePath(reducedImagePath.toString()))
+                bedrockRootPath.resolve(IdentifierUtils.toBedrockTexturePath(reducedImagePath.toString()))
         );
     }
 }
