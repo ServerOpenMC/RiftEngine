@@ -5,7 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fr.openmc.core.utils.JsonUtils;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
+import fr.openmc.riftengine.core.utils.ImageUtils;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ public class ChestScreenWriter implements PackWriter {
                 "texture": "<texture_path>",
                 "size": [<width>, <height>],
                 "keep_ratio": false,
-                "offset": [1, <offset_y>],
+                "offset": [<offset_x>, <offset_y>],
                 "anchor_from": "top_middle",
                 "anchor_to": "top_middle",
                 "layer": 4,
@@ -67,14 +69,23 @@ public class ChestScreenWriter implements PackWriter {
             }
             """;
 
-    // todo: voir offset_x qd https://github.com/PluginBugs/Issues-ItemsAdder/issues/5576
-    private void handleChestGui(Path javaRootPath, JsonObject root) {
+    private void handleChestGui(Path javaRootPath, JsonObject root) throws IOException {
         for (ResolvedChestGui chestGui : chestGuis) {
+            BufferedImage src = ImageUtils.read(chestGui.javaTexturePath(javaRootPath));
+            BufferedImage centered = ImageUtils.center(src);
+
+            int shift = ImageUtils.centerShiftY(src);
+            int offsetY = 5 - chestGui.entry().yPosition() - shift;
+
+            int gridLeft = ImageUtils.findGridLeft(centered);
+            int offsetX = gridLeft == -1 ? 0 : 7 - gridLeft - (176 - centered.getWidth()) / 2;
+
             root.add(PREFIX + "_" + chestGui.key(), JsonUtils.parseJson(TEMPLATE_CHEST_GUI
                     .replace("<texture_path>", chestGui.bedrockTexturePath(javaRootPath).toString())
                     .replace("<width>", String.valueOf(chestGui.width()))
                     .replace("<height>", String.valueOf(chestGui.height()))
-                    .replace("<offset_y>", String.valueOf(-(chestGui.entry().yPosition()-5)))
+                    .replace("<offset_y>", String.valueOf(offsetY))
+                    .replace("<offset_x>", String.valueOf(offsetX))
                     .replace("<visible_condition>",
                             "(not ($atext - '" + PREFIX + ":" + chestGui.key() + "' = $atext))")));
         }
