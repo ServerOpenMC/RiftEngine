@@ -10,7 +10,7 @@ public class TooltipGlyph extends Glyph {
     private final ResolvedTooltipResource tooltipResource;
 
     public TooltipGlyph(String namespacedId, int row, int col, ResolvedTooltipResource tooltipResource) {
-        super(namespacedId, GlyphsRegistry.TOOLTIP_PAGE, row, col);
+        super(namespacedId, GlyphsRegistry.OTHER_PAGE, row, col);
         this.tooltipResource = tooltipResource;
     }
 }

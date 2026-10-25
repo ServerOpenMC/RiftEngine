@@ -26,7 +26,6 @@ public class ItemsTextureWriter implements PackWriter {
 
             for (ResolvedItemResource resource : resources) {
                 if (resource.isVanilla()) continue;
-
                 Path outputFile = bedrockRootPath.resolve(IdentifierUtils.toBedrockTexturePath(resource.bedrockTexturePath()));
                 this.copyFile(resource.sourcePath(), outputFile);
             }

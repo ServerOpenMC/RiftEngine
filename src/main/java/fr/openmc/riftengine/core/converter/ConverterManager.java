@@ -1,5 +1,6 @@
 package fr.openmc.riftengine.core.converter;
 
+import com.comphenix.protocol.ProtocolLibrary;
 import dev.simplified.image.ImageData;
 import dev.simplified.image.ImageFactory;
 import dev.simplified.image.ImageFormat;
@@ -15,6 +16,8 @@ import fr.openmc.riftengine.core.RiftRegistry;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.converter.writers.blocks.BlocksMappingWriter;
 import fr.openmc.riftengine.core.converter.writers.blocks.TerrainTextureJsonWriter;
+import fr.openmc.riftengine.core.converter.writers.glyph.chestgui.ChestGuiTextureWriter;
+import fr.openmc.riftengine.core.converter.writers.glyph.chestgui.ChestScreenWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.font.FontWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.icons.IconsWriter;
 import fr.openmc.riftengine.core.converter.writers.glyph.icons.SymbolWriter;
@@ -38,6 +41,7 @@ import fr.openmc.riftengine.core.converter.writers.tooltip.glyph.TooltipGlyphAss
 import fr.openmc.riftengine.core.converter.writers.tooltip.textures.TooltipTextureWriter;
 import fr.openmc.riftengine.core.converter.writers.translations.TranslationInjector;
 import fr.openmc.riftengine.core.converter.writers.ui.ScoreboardUiWriter;
+import fr.openmc.riftengine.core.listeners.ChestGuiTitleListener;
 import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import fr.openmc.riftengine.core.resolvers.mcmeta.animation.AnimationMcMetaResolver;
 import fr.openmc.riftengine.core.resolvers.mcmeta.gui.GuiMcMetaResolver;
@@ -87,6 +91,9 @@ public class ConverterManager {
 
             register("Icônes ItemsAdder", new IconsWriter(itemsAdderContents));
             register("Mappings des symboles", new SymbolWriter());
+
+            register("Textures des Chest GUI", new ChestGuiTextureWriter());
+            register("Génération du JSON UI pour les Chest GUI", new ChestScreenWriter());
 
             register("Textures des items", new ItemsTextureJsonWriter(items, itemResolver));
             register("Fichiers de textures", new ItemsTextureWriter(items, itemResolver));
@@ -151,6 +158,11 @@ public class ConverterManager {
         Files.createDirectories(bedrockBuildDir);
 
         ZipUtils.unzip(javaPackPath, javaExtractDir);
+
+        ProtocolLibrary.getProtocolManager().addPacketListener(
+                new ChestGuiTitleListener(javaExtractDir,
+                        getItemsAdderContents(RiftPlugin.getInstance()).getParent(),
+                        RiftPlugin.getInstance()));
 
         for (PackWriter writer : writers) {
             writer.write(bedrockBuildDir, javaExtractDir);
