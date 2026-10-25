@@ -1,13 +1,13 @@
 package fr.openmc.riftengine.core.converter.writers.tooltip.textures;
 
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
+import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.converter.writers.PackWriter;
 import fr.openmc.riftengine.core.resolvers.mcmeta.gui.GuiMcMetaResolver;
 import fr.openmc.riftengine.core.resolvers.mcmeta.gui.ResolvedGuiMcMeta;
 import fr.openmc.riftengine.core.resolvers.tooltip.ResolvedTooltipResource;
 import fr.openmc.riftengine.core.resolvers.tooltip.TooltipResourceResolver;
-import fr.openmc.riftengine.core.utils.IdentifierUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -15,11 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-// - ecrire les textures dans le resourcepack bedrock
-//   * faire un scanner pour savoir les frames, fps, et tt chose qui sont relié entre les textures et ui_common.json
-// - allouer un glyph pour chaque "type" de tooltip + le mettre dans l'item name + demander reload ia
-// - ecrire le ui/ui_common.json (une giga template que j'adapte en fonction des textures)
 public class TooltipTextureWriter implements PackWriter {
     private final List<ItemEntry> items;
     private final GuiMcMetaResolver guiResolver;

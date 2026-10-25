@@ -4,14 +4,17 @@ plugins {
 }
 
 group = 'fr.openmc.riftengine'
-version = '0.5-SNAPSHOT'
+version = '0.6-SNAPSHOT'
 
 repositories {
     mavenCentral()
+
+    // * ProtocolLib
+    maven {url "https://repo.dmulloy2.net/repository/public/"}
     // * GeyserMC
     maven {url "https://repo.opencollab.dev/main/"}
     // * PaperMC
-    maven { url = "https://repo.papermc.io/repository/maven-public/" }
+    maven {url = "https://repo.papermc.io/repository/maven-public/" }
     // * ItemsAdder
     maven {url "https://maven.devs.beer/"}
 }
@@ -20,8 +23,10 @@ dependencies {
     paperweight.paperDevBundle "${minecraftVersion}.build.${paperVersion}"
 
     // Dependancies
+    compileOnly "net.dmulloy2:ProtocolLib:${protocolLibVersion}"
     compileOnly "beer.devs:itemsadder-api:${itemsAdderVersion}"
     compileOnly "org.geysermc.geyser:api:${geyserApiVersion}"
+    compileOnly "org.geysermc.floodgate:api:${floodgateApiVersion}"
 
     compileOnly files("libs/OpenMC.jar")
     implementation "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"

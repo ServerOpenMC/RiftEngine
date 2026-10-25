@@ -1,9 +1,9 @@
 package fr.openmc.riftengine.core.resolvers.items;
 
 import fr.openmc.riftengine.api.scanner.items.ItemEntry;
+import fr.openmc.riftengine.api.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.RiftLog;
 import fr.openmc.riftengine.core.registry.resolver.AbstractResolver;
-import fr.openmc.riftengine.core.utils.IdentifierUtils;
 import fr.openmc.riftengine.core.utils.PathUtils;
 
 import java.nio.file.Path;
