@@ -1,10 +1,11 @@
 plugins {
     id 'java'
+    id "com.gradleup.shadow" version "9.6.1"
     id "io.papermc.paperweight.userdev" version "${paperWeightUserDevVersion}"
 }
 
 group = 'fr.openmc.riftengine'
-version = '0.6-SNAPSHOT'
+version = '0.7-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -17,6 +18,8 @@ repositories {
     maven {url = "https://repo.papermc.io/repository/maven-public/" }
     // * ItemsAdder
     maven {url "https://maven.devs.beer/"}
+    // * Jitpack
+    maven { url = "https://jitpack.io" }
 }
 
 dependencies {
@@ -27,6 +30,8 @@ dependencies {
     compileOnly "beer.devs:itemsadder-api:${itemsAdderVersion}"
     compileOnly "org.geysermc.geyser:api:${geyserApiVersion}"
     compileOnly "org.geysermc.floodgate:api:${floodgateApiVersion}"
+
+    implementation("com.github.minecraft-library:asset-renderer:master-SNAPSHOT")
 
     compileOnly files("libs/OpenMC.jar")
     implementation "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
@@ -59,10 +64,15 @@ tasks.jar {
     destinationDirectory.set(file('./builds/'))
 }
 
-tasks.register('copyJarToServer', Copy) {
-    dependsOn tasks.jar
+tasks.shadowJar {
+    destinationDirectory.set(file('./builds/'))
+    archiveFileName.set('RiftEngine.jar')
+}
 
-    from tasks.jar
+tasks.register('copyJarToServer', Copy) {
+    dependsOn tasks.shadowJar
+
+    from tasks.shadowJar
 
     if (localProperties.getProperty('minecraftServerDir')) {
         into file("${localProperties.getProperty('minecraftServerDir')}/plugins")

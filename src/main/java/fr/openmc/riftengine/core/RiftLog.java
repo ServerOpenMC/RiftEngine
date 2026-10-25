@@ -22,12 +22,15 @@ public enum RiftLog {
     GLYPH_NOT_FOUND("Glyph {} introuvable", LogType.WARN),
     FLIPBOOK_NULL("Flipbook est null pour ce tooltip {}", LogType.WARN),
     NULL("{} est null", LogType.WARN),
+    ENTRY_EQUIPMENT_NULL("{} est null, item qui se fait passer pour une piece d'armure mais que la texture/model est géré autrement ", LogType.WARN),
+
+    MODEL_PARENT("le model ({}) convertit est null, le model hérite surement de parent et doit etre géré autrement", LogType.WARN),
 
     PATH_CANT_REDUCED_TO_TEXTURES("resource {} ne peut pas etre réduite à un chemin de texture", LogType.WARN),
     ;
 
     public static void logBanner(String pluginVersion, String server, String javaVersion) {
-        OMCLogger.info("\u001B[1;35m██████╗ ██╗███████╗████████╗    \u001B[0;95mRIFT v{}\u001B[0m", pluginVersion);
+        OMCLogger.info("\u001B[1;35m██████╗ ██╗███████╗████████╗    \u001B[0;95mRiftEngine v{}\u001B[0m", pluginVersion);
         OMCLogger.info("\u001B[1;35m██╔══██╗██║██╔════╝╚══██╔══╝    \u001B[0;90mPaper {}\u001B[0m", server);
         OMCLogger.info("\u001B[1;95m██████╔╝██║█████╗     ██║       \u001B[0;90mJava  {}\u001B[0m", javaVersion);
         OMCLogger.info("\u001B[1;95m██╔══██╗██║██╔══╝     ██║   \u001B[0m");

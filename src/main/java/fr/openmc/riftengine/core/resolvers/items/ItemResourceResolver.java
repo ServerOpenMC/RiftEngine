@@ -29,7 +29,7 @@ public class ItemResourceResolver extends AbstractResolver<ItemEntry, List<Resol
             String state = entry.getKey();
             String resourceId = entry.getValue();
             Path bedrockTexturePath = bedrockTexturePaths.get(state);
-            String bedrockIdentifier = state.equals(ItemEntry.DEFAULT_STATE) ? item.getKey() : item.getKey() + "_" + state;
+            String bedrockIdentifier = resolveBedrockIdentifier(item, state);
             String bedrockTextureValue = null;
             String modelResourceId = item.getNamespace() + ":ia_auto/" + item.getKey();
 
@@ -69,5 +69,15 @@ public class ItemResourceResolver extends AbstractResolver<ItemEntry, List<Resol
         }
 
         return resolved;
+    }
+
+    public String resolveBedrockIdentifier(ItemEntry item, String state) {
+        return state.equals(ItemEntry.DEFAULT_STATE) ? resolveBedrockIdentifier(item) : item.getKey() + "_" + state;
+
+    }
+
+    public String resolveBedrockIdentifier(ItemEntry item) {
+        return item.getKey();
+
     }
 }

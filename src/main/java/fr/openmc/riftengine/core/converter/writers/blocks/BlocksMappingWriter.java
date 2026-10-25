@@ -42,11 +42,12 @@ public class BlocksMappingWriter implements PackWriter {
 
             List<ResolvedItemResource> resources = resolver.resolve(javaRootPath, item);
 
+            String parentModel = item.getGraphics().parent();
             BlockStateScanner.CustomBlockState state = blockBehaviour.blockState();
 
             JsonObject def = new JsonObject();
             def.addProperty("name", item.getKey());
-            def.addProperty("geometry", "minecraft:geometry.full_block");
+            def.addProperty("geometry", getGeometryBlockFromParent(parentModel));
             def.add("material_instances", createMaterialInstance(resources));
 
             blockStatesByBlock.computeIfAbsent(state.javaBlock(), _ -> new JsonObject())
@@ -69,6 +70,7 @@ public class BlocksMappingWriter implements PackWriter {
 
         Files.deleteIfExists(outputFile);
         this.writeJsonFile(outputFile, root);
+        this.writeJsonFile(RiftPlugin.getInstance().getOutputDir().resolve(OUTPUT_FILE), root);
     }
 
     private JsonObject createMaterialInstance(List<ResolvedItemResource> faceResources) {
@@ -102,5 +104,16 @@ public class BlocksMappingWriter implements PackWriter {
         m.addProperty("face_dimming", true);
         m.addProperty("ambient_occlusion", true);
         return m;
+    }
+
+    private String getGeometryBlockFromParent(String parentModel) {
+        String defaultGeometry = "minecraft:geometry.full_block";
+        if (parentModel == null) return defaultGeometry;
+        String parent = IdentifierUtils.normalizeId(parentModel);
+
+        if (!parent.startsWith("minecraft:")) return defaultGeometry;
+        if (parentModel.contains("block/cross"))
+            return "minecraft:geometry.cross";
+        return defaultGeometry;
     }
 }

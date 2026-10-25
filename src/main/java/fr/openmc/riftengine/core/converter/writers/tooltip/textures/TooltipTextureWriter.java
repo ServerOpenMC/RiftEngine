@@ -70,7 +70,7 @@ public class TooltipTextureWriter implements PackWriter {
         FrameTextureConverter.convert(
                 resolvedGuiMcMeta,
                 imagePath,
-                bedrockRootPath.resolve( IdentifierUtils.toBedrockTexturePath(reducedImagePath.toString()))
+                bedrockRootPath.resolve(IdentifierUtils.toBedrockTexturePath(reducedImagePath.toString()))
         );
     }
 }
