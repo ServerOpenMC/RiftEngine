@@ -1,5 +1,9 @@
 package fr.openmc.riftengine.core.converter;
 
+import dev.simplified.image.ImageData;
+import dev.simplified.image.ImageFactory;
+import dev.simplified.image.ImageFormat;
+import dev.simplified.image.pixel.Background;
 import fr.openmc.core.OMCRegistry;
 import fr.openmc.core.bootstrap.integration.OMCLogger;
 import fr.openmc.core.utils.FilesUtils;
@@ -38,6 +42,9 @@ import fr.openmc.riftengine.core.resolvers.items.ItemResourceResolver;
 import fr.openmc.riftengine.core.resolvers.mcmeta.animation.AnimationMcMetaResolver;
 import fr.openmc.riftengine.core.resolvers.mcmeta.gui.GuiMcMetaResolver;
 import fr.openmc.riftengine.core.resolvers.tooltip.TooltipResourceResolver;
+import fr.openmc.riftengine.core.utils.AssetRender;
+import lib.minecraft.renderer.AtlasRenderer;
+import lib.minecraft.renderer.call.request.AtlasOptions;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -49,6 +56,7 @@ import java.util.List;
 public class ConverterManager {
 
     private final RiftPlugin plugin;
+    private AssetRender assetRender;
 
     private final List<PackWriter> writers = new ArrayList<>();
 
@@ -119,9 +127,24 @@ public class ConverterManager {
     public Path generateConvertedPack() throws Exception {
         Path javaPackPath = getJavaPackPath(RiftPlugin.getInstance());
 
+        this.assetRender = new AssetRender(javaPackPath.toFile());
+
+        AtlasOptions options = AtlasOptions.builder()
+                .filter(id -> !id.startsWith("minecraft:"))             // omit for every block and item in the game
+                .tileSize(128)
+                .columns(100)
+                .background(Background.checkerboard())
+                .progressLogging(false)                        // on by default; a library consumer wants it off
+                .build();
+
+        ImageData sheet = new AtlasRenderer(assetRender.getContext()).render(options).image();
+
         Path outputDir = plugin.getOutputDir();
+
         FilesUtils.deleteDirectory(outputDir.toFile());
         Files.createDirectories(outputDir);
+
+        ImageFactory.toFile(sheet, ImageFormat.PNG, outputDir.resolve("aywenite_block.png").toFile());
 
         Path javaExtractDir = outputDir.resolve("java");
         Path bedrockBuildDir = outputDir.resolve("bedrock");

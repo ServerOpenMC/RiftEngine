@@ -36,20 +36,40 @@ public class ItemsMappingWriter implements PackWriter {
         for (ItemEntry item : items) {
             List<ResolvedItemResource> resources = resolver.resolve(javaRootPath, item);
 
+            String material = item.getMaterial().getKey().asString();
+
+            if (material.equals("minecraft:tripwire"))
+                material = "minecraft:tripwire_hook";
+
             JsonArray definitions = byMaterial.computeIfAbsent(
-                    item.getMaterial().getKey().asString(),
+                    material,
                     _ -> new JsonArray()
             );
 
             if (resources.size() == 1) {
                 // * Gestion des items a une texture
                 definitions.add(handleUniqueTexture(item, resolver, resources.getFirst()));
-            } else if (resources.size() > 1) {
+            } else if (resources.size() > 1 && item.getBehaviour().isItem()) {
                 // * Gestion des items a plusieurs textures
                 JsonObject def = new JsonObject();
                 def.addProperty("type", "group");
                 def.addProperty("model", resources.getFirst().modelResourceId());
                 def.add("definitions", handleMultipleTexture(item, resources));
+
+                definitions.add(def);
+            } else if (resources.size() > 1 && !item.getBehaviour().isItem()) {
+                // * Gestion des non items (ex block qui sont géré par le block mapping)
+                JsonObject def = new JsonObject();
+                String bedrockIdentifier = resources.getFirst().bedrockIdentifier();
+                def.addProperty("type", "definition");
+                def.addProperty("model", resources.getFirst().modelResourceId());
+                def.addProperty("bedrock_identifier", bedrockIdentifier);
+
+                if (item.getBehaviour().isItem()) {
+                    JsonObject options = new JsonObject();
+                    options.addProperty("icon", bedrockIdentifier);
+                    def.add("bedrock_options", options);
+                }
 
                 definitions.add(def);
             } else {

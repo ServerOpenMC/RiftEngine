@@ -31,7 +31,7 @@ public enum RiftLog {
     ;
 
     public static void logBanner(String pluginVersion, String server, String javaVersion) {
-        OMCLogger.info("\u001B[1;35m██████╗ ██╗███████╗████████╗    \u001B[0;95mRIFT v{}\u001B[0m", pluginVersion);
+        OMCLogger.info("\u001B[1;35m██████╗ ██╗███████╗████████╗    \u001B[0;95mRiftEngine v{}\u001B[0m", pluginVersion);
         OMCLogger.info("\u001B[1;35m██╔══██╗██║██╔════╝╚══██╔══╝    \u001B[0;90mPaper {}\u001B[0m", server);
         OMCLogger.info("\u001B[1;95m██████╔╝██║█████╗     ██║       \u001B[0;90mJava  {}\u001B[0m", javaVersion);
         OMCLogger.info("\u001B[1;95m██╔══██╗██║██╔══╝     ██║   \u001B[0m");

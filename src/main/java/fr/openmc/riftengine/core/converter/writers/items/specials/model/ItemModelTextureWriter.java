@@ -41,7 +41,6 @@ public class ItemModelTextureWriter implements PackWriter {
             if (rootModelJson == null) continue;
 
             ModelTextureAtlas atlas = ModelTextureAtlas.build(javaRootPath, rootModelJson, model.namespace());
-            System.out.println("atlas de " + item.namespacedId() + " " + atlas);
             if (atlas == null) continue;
 
             Path output = bedrockRootPath.resolve(model.toBedrockAtlasPath() + ".png");

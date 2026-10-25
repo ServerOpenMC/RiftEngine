@@ -88,8 +88,6 @@ public class ItemModelAttachableWriter implements PackWriter {
 
             List<String> textures = model.texturesPath(javaRootPath);
 
-            System.out.println("textures " + textures);
-
             if (textures.isEmpty()) continue;
 
             JsonObject root = JsonUtils.parseJson(TEMPLATE_ATTACHABLE
